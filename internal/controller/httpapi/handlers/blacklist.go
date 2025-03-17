@@ -14,7 +14,7 @@ type BlackList struct {
 	log     *zerolog.Logger
 }
 
-func NewBlacList(service *service.BlackList, log *zerolog.Logger) *BlackList {
+func NewBlackList(service *service.BlackList, log *zerolog.Logger) *BlackList {
 	return &BlackList{service: service, log: log}
 }
 

@@ -6,8 +6,8 @@ import (
 )
 
 type WhiteListStore interface {
-	Add(prefix, mask string) error
-	Remove(prefix, mask string) error
+	AddIP(prefix, mask string) error
+	DeleteIP(prefix, mask string) error
 	GetIPs() ([]entity.IpNetwork, error)
 }
 
@@ -26,7 +26,7 @@ func (w *WhiteList) AddIP(network entity.IpNetwork) error {
 	if err != nil {
 		return err
 	}
-	err = w.stor.Add(prefix, network.Mask)
+	err = w.stor.AddIP(prefix, network.Mask)
 	if err != nil {
 		return err
 	}
@@ -39,7 +39,7 @@ func (w *WhiteList) DeleteIP(network entity.IpNetwork) error {
 	if err != nil {
 		return err
 	}
-	err = w.stor.Remove(prefix, network.Mask)
+	err = w.stor.DeleteIP(prefix, network.Mask)
 	if err != nil {
 		return err
 	}

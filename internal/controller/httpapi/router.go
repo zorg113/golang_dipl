@@ -15,18 +15,19 @@ type HttpApiRouter struct {
 	log       *zerolog.Logger
 }
 
-func NewRouter(auth *handlers.Authorization, balckList *handlers.BlackList, whiteList *handlers.WhiteList, log *zerolog.Logger) *HttpApiRouter {
+func NewRouter(auth *handlers.Authorization, balckList *handlers.BlackList, whiteList *handlers.WhiteList, bucket *handlers.Bucket, log *zerolog.Logger) *HttpApiRouter {
 	router := mux.NewRouter()
 	return &HttpApiRouter{
 		router:    router,
 		auth:      auth,
 		blackLits: balckList,
 		whiteList: whiteList,
+		bucket:    bucket,
 		log:       log,
 	}
 }
 
-func (r *HttpApiRouter) InitRoutes() {
+func (r *HttpApiRouter) InitRouters() {
 	r.router.HandleFunc("/auth/check", r.auth.AuthorizationHanler).Methods("POST")
 	r.router.HandleFunc("/bucket/reset", r.bucket.ResetBucket).Methods("DELETE")
 	r.router.HandleFunc("/blacklist/add", r.blackLits.AddIP).Methods("POST")
@@ -37,6 +38,6 @@ func (r *HttpApiRouter) InitRoutes() {
 	r.router.HandleFunc("/whitelist/remove", r.whiteList.DeleteIP).Methods("DELETE")
 }
 
-func (r *HttpApiRouter) GetRouter() *mux.Router{
+func (r *HttpApiRouter) GetRouter() *mux.Router {
 	return r.router
 }

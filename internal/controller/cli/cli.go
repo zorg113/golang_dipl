@@ -28,7 +28,7 @@ type CommandLineInterface struct {
 	serviceWhiteList *service.WhiteList
 }
 
-func New(serviceAuth *service.Authorization, serviceBlackList *service.BlackList, serviceWhiteList *service.WhiteList) *CommandLineInterface {
+func NewCommandLineInterface(serviceAuth *service.Authorization, serviceBlackList *service.BlackList, serviceWhiteList *service.WhiteList) *CommandLineInterface {
 	return &CommandLineInterface{
 		serviceAuth:      serviceAuth,
 		serviceBlackList: serviceBlackList,
@@ -36,7 +36,7 @@ func New(serviceAuth *service.Authorization, serviceBlackList *service.BlackList
 	}
 }
 
-func (cli *CommandLineInterface) Run() {
+func (cli *CommandLineInterface) Run(ch chan os.Signal) {
 	executer := prompt.Executor(func(s string) {
 		s = strings.TrimSpace(s)
 		setCommand := strings.Split(s, " ")
@@ -53,7 +53,8 @@ func (cli *CommandLineInterface) Run() {
 				println(suggestion.Text + " - " + suggestion.Description)
 			}
 		case "exit":
-			os.Exit(0)
+			ch <- os.Interrupt
+			return
 		default:
 			println("Invalid command")
 		}

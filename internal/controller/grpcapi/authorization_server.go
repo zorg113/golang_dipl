@@ -7,18 +7,17 @@ import (
 	"github.com/rs/zerolog"
 	"github.com/zorg113/golang_dipl/atibruteforce/internal/controller/grpcapi/authorizationpb"
 	"github.com/zorg113/golang_dipl/atibruteforce/internal/controller/httpapi/handlers"
-	"github.com/zorg113/golang_dipl/atibruteforce/internal/controller/proto/authorizationpb"
 	"github.com/zorg113/golang_dipl/atibruteforce/model/entity"
 	"github.com/zorg113/golang_dipl/atibruteforce/model/service"
 )
 
 type AuthorizationServer struct {
-	authorizationpb.UnimplementedAuthorizationSrver
+	authorizationpb.UnimplementedAuthorizationServer
 	service *service.Authorization
 	log     *zerolog.Logger
 }
 
-func NewAuthosization(service *service.Authorization, log *zerolog.Logger) *AuthorizationServer {
+func NewAuthorization(service *service.Authorization, log *zerolog.Logger) *AuthorizationServer {
 	return &AuthorizationServer{service: service, log: log}
 }
 
@@ -32,10 +31,10 @@ func (s *AuthorizationServer) Authorization(ctx context.Context, in *authorizati
 	if !handlers.ValidateRequest(req) {
 		return nil, errors.New("Invalid authorization request")
 	}
-	isAlllowed, err := s.service
+	isAllowed, err := s.service.Authorization(req)
 	if err != nil {
 		s.log.Error().Err(err).Msg("Failed to authorization request")
 		return nil, err
 	}
-	return &authorizationpb.AuthorizationResponse{IsAllowed: isAllowed}, nil
+	return &authorizationpb.AuthorizationResponse{IsAllow: isAllowed}, nil
 }
