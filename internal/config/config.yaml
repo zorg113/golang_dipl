@@ -1,0 +1,23 @@
+listen:
+    Type: port
+    BindIP: 127.0.0.1
+    Port: "36590"
+server:
+    ReadTimeout: 10
+    WriteTimeout: 30
+    IdleTimeout: 40
+    ServerType: http
+appconfig:
+    LogLevel: info
+dbdata:
+    Host: 127.0.0.1
+    DbName: bruteforce
+    Port: "2556"
+    DbUser: control
+    DbPassword: HiWorld
+    SslMode: "false"
+bucket:
+    IpLimit: 1000
+    LoginLimit: 10
+    PasswordLimit: 10
+    ResetBucketInterval: 100

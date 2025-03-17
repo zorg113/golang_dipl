@@ -1,0 +1,23 @@
+Listen:
+  Type: "localhos"
+  BindIp: "127.0.0.1"
+  Port: 58963
+Server:
+  ReadTimeout: 10
+  WriteTimeOut: 30
+  IdleTimeout: 50
+  ServerType: "http"
+AppConfig:
+  LogLevel: "info"
+DbData:
+  Host: "127.0.0.1"
+  DbName: "bruteforce"
+  Port: "2556"
+  DbUser: "control"
+  DbPassword: "HiWorld"
+  SslMode: "false"
+Bucket:
+  IpLimit: 1000
+  LoginLimit: 10
+  PasswordLimit: 100
+  ResetBucketInterval: 100
