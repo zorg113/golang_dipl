@@ -26,3 +26,30 @@ build.bin:
 lint:
 	golangci-lint run
 
+.PHONY: build.docker
+build.docker:
+	docker build --tag  antibrf -- .
+
+.PHONY: build
+build:
+	docker compose build
+
+.PHONY: run
+run: build
+	docker compose up
+
+.PHONY: stop
+stop: 
+	docker compose down
+
+.PHONY:migrate
+migrate:
+	migrate -version $(version)
+
+.PHONY: migrate.down
+migrate.down:
+	migrate -source file://migrations -database postgres://localhost:5433/antibruteforce-service-database?sslmode=disable down
+
+.PHONY: migrate.up
+migrate.up:
+	migrate -source file://migrations -database postgres://localhost:5433/antibruteforce-service-database?sslmode=disable up

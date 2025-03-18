@@ -46,25 +46,25 @@ type Config struct {
 	Bucket    Bucket
 }
 
-func WriteData(conf Config) {
-	yamlFile, err := yaml.Marshal(&conf)
-	if err != nil {
-		panic(err)
-	}
+// func WriteData(conf Config) {
+// 	yamlFile, err := yaml.Marshal(&conf)
+// 	if err != nil {
+// 		panic(err)
+// 	}
 
-	fmt.Println(string(yamlFile))
+// 	fmt.Println(string(yamlFile))
 
-	f, err := os.Create("config.yaml")
-	if err != nil {
-		panic(err)
-	}
-	defer f.Close()
+// 	f, err := os.Create("config.yaml")
+// 	if err != nil {
+// 		panic(err)
+// 	}
+// 	defer f.Close()
 
-	_, err = f.Write(yamlFile)
-	if err != nil {
-		panic(err)
-	}
-}
+// 	_, err = f.Write(yamlFile)
+// 	if err != nil {
+// 		panic(err)
+// 	}
+// }
 
 func NewConfig(path string) (Config, error) {
 	var conf Config
