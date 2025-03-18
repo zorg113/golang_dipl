@@ -27,30 +27,29 @@ type AntiBruteForceApp struct {
 	config                  *config.Config
 }
 
-func NewAntiBruteForceApp(config *config.Config) *AntiBruteForceApp {
-	logger := zerolog.New(os.Stderr).With().Timestamp().Logger()
-	dbClient := client.NewPostgresSql(&logger, config)
+func NewAntiBruteForceApp(logger *zerolog.Logger, config *config.Config) *AntiBruteForceApp {
+	dbClient := client.NewPostgresSql(logger, config)
 	err := dbClient.Open()
 	if err != nil {
 		logger.Fatal().Err(err).Msg("failed to connect to postgres")
 	}
 	blackListStor := adapters.NewBlackListStorage(dbClient)
-	blackListService := service.NewBlackList(blackListStor, &logger)
-	blackListHandler := handlers.NewBlackList(blackListService, &logger)
-	blacklistGrpc := grpcapi.NewBlackListServer(blackListService, &logger)
+	blackListService := service.NewBlackList(blackListStor, logger)
+	blackListHandler := handlers.NewBlackList(blackListService, logger)
+	blacklistGrpc := grpcapi.NewBlackListServer(blackListService, logger)
 
 	whiteListStor := adapters.NewWhiteListStorage(dbClient)
-	whiteListService := service.NewWhiteList(whiteListStor, &logger)
-	whiteListHandler := handlers.NewWhiteList(whiteListService, &logger)
-	whiteListGrpc := grpcapi.NewWhiteListServer(whiteListService, &logger)
+	whiteListService := service.NewWhiteList(whiteListStor, logger)
+	whiteListHandler := handlers.NewWhiteList(whiteListService, logger)
+	whiteListGrpc := grpcapi.NewWhiteListServer(whiteListService, logger)
 
-	authorizarionService := service.NewAuthorization(blackListService, whiteListService, config, &logger)
-	authrizationHandler := handlers.NewAuthorization(authorizarionService, &logger)
-	bucketHandler := handlers.NewBucket(authorizarionService, &logger)
-	bucketGrpc := grpcapi.NewBucketServer(authorizarionService, &logger)
-	authorizationGrpc := grpcapi.NewAuthorization(authorizarionService, &logger)
+	authorizarionService := service.NewAuthorization(blackListService, whiteListService, config, logger)
+	authrizationHandler := handlers.NewAuthorization(authorizarionService, logger)
+	bucketHandler := handlers.NewBucket(authorizarionService, logger)
+	bucketGrpc := grpcapi.NewBucketServer(authorizarionService, logger)
+	authorizationGrpc := grpcapi.NewAuthorization(authorizarionService, logger)
 
-	router := httpapi.NewRouter(authrizationHandler, blackListHandler, whiteListHandler, bucketHandler, &logger)
+	router := httpapi.NewRouter(authrizationHandler, blackListHandler, whiteListHandler, bucketHandler, logger)
 
 	cli := cli.NewCommandLineInterface(authorizarionService, blackListService, whiteListService)
 
@@ -62,7 +61,7 @@ func NewAntiBruteForceApp(config *config.Config) *AntiBruteForceApp {
 		grpcAuthorizationServer: authorizationGrpc,
 		cli:                     cli,
 		dbClient:                dbClient,
-		logger:                  &logger,
+		logger:                  logger,
 		config:                  config,
 	}
 }

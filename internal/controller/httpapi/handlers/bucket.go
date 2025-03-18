@@ -43,7 +43,11 @@ func (b *Bucket) ResetBucket(w http.ResponseWriter, r *http.Request) {
 	isIpReset := b.service.ResetIpBucket(request.Ip)
 	if !isIpReset {
 		b.log.Info().Msg("Failed to reset IP bucket")
-		w.Write([]byte("resetIp=false"))
+		_, err = w.Write([]byte("resetIp=false"))
+		if err != nil {
+            b.log.Error().Err(err).Msg("Failed to write response")
+            w.WriteHeader(http.StatusInternalServerError)
+        }
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}

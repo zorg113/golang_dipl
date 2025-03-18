@@ -7,7 +7,8 @@ gen:
 
 .PHONY: mok_gen
 mok_gen:
-	echo "empty"
+	mockgen -source=model/service/blacklist.go -destination=store/adapters/mock_blacklist.go
+	mockgen -source=model/service/whitelist.go -destination=store/adapters/mock_whitelist.go
 
 .PHONY:clean
 clean:
@@ -16,5 +17,12 @@ clean:
 	rm -f internal/controller/grpcapi/authorizationpb/*
 	rm -f internal/controller/grpcapi/bucketpb/*
 
+.PHONY: build.bin
 
+build.bin:
+	go build -o ./build/antibriteforce_service ./cmd/service
+
+.PHONY: lint
+lint:
+	golangci-lint run
 

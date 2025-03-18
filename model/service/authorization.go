@@ -24,12 +24,14 @@ func NewAuthorization(bList *BlackList, wList *WhiteList,
 	ipBucketStorage := make(map[string]*RateLimiter)
 	loginBucketStorage := make(map[string]*RateLimiter)
 	passwordBucketStorage := make(map[string]*RateLimiter)
-	return &Authorization{ipBucketStorage: ipBucketStorage,
+	auth := &Authorization{ipBucketStorage: ipBucketStorage,
 		loginBucketStorage:    loginBucketStorage,
 		passwordBucketStorage: passwordBucketStorage,
 		blackList:             bList,
 		whiteList:             wList,
 	}
+	go auth.deleteUnusedBucket()
+	return auth
 }
 
 func (a *Authorization) Authorization(request entity.Request) (bool, error) {

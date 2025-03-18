@@ -92,4 +92,8 @@ func (b *BlackList) GetIPs(w http.ResponseWriter, r *http.Request /* router para
 		return
 	}
 	_, err = w.Write(jsonResponse)
+	if err != nil {
+		b.log.Error().Err(err).Msg("Failed to write response")
+		w.WriteHeader(http.StatusInternalServerError)
+	}
 }

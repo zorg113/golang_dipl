@@ -2,7 +2,6 @@ package config
 
 import (
 	"fmt"
-	"io"
 	"os"
 
 	"gopkg.in/yaml.v3"
@@ -61,7 +60,7 @@ func WriteData(conf Config) {
 	}
 	defer f.Close()
 
-	_, err = io.WriteString(f, string(yamlFile))
+	_, err = f.Write(yamlFile)
 	if err != nil {
 		panic(err)
 	}
