@@ -52,6 +52,7 @@ func TestBlackList_AddIP(t *testing.T) {
 	ip := cases[0].network
 
 	body, err := json.Marshal(ip)
+	require.NoError(t, err)
 
 	req, err := http.NewRequest("POST", "/auth/blacklist", bytes.NewReader(body))
 	require.NoError(t, err)
@@ -117,6 +118,7 @@ func TestBlackList_DeleteIP(t *testing.T) {
 	ip := cases[0].network
 
 	body, err := json.Marshal(ip)
+	require.NoError(t, err)
 
 	req, err := http.NewRequest("DELETE", "/auth/blacklist", bytes.NewReader(body))
 	require.NoError(t, err)
