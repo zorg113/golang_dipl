@@ -19,8 +19,8 @@ func NewBlackList(service *service.BlackList, log *zerolog.Logger) *BlackList {
 	return &BlackList{service: service, log: log}
 }
 
-func (b *BlackList) AddIP(w http.ResponseWriter, r *http.Request /*router params*/) {
-	b.log.Info().Msg("Add IP to black list handler by POST /blacklist/add called")
+func (b *BlackList) AddIP(w http.ResponseWriter, r *http.Request) {
+	b.log.Info().Msg("Add IP to black list handler by POST /auth/whitelist called")
 	common.InitHeaders(w)
 	var inIP entity.IpNetwork
 	err := json.NewDecoder(r.Body).Decode(&inIP)
@@ -50,11 +50,11 @@ func (b *BlackList) AddIP(w http.ResponseWriter, r *http.Request /*router params
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
-	w.WriteHeader(http.StatusNoContent) // ????
+	w.WriteHeader(http.StatusNoContent)
 }
 
-func (b *BlackList) DeleteIP(w http.ResponseWriter, r *http.Request /* router params */) {
-	b.log.Info().Msg("Remove IP from black list handler by DELETE /blacklist/remove called")
+func (b *BlackList) DeleteIP(w http.ResponseWriter, r *http.Request) {
+	b.log.Info().Msg("Remove IP from black list handler by DELETE /auth/whitelist called")
 	common.InitHeaders(w)
 	var inIP entity.IpNetwork
 	err := json.NewDecoder(r.Body).Decode(&inIP)
@@ -77,8 +77,8 @@ func (b *BlackList) DeleteIP(w http.ResponseWriter, r *http.Request /* router pa
 	w.WriteHeader(http.StatusNoContent)
 }
 
-func (b *BlackList) GetIPs(w http.ResponseWriter, r *http.Request /* router params */) {
-	b.log.Info().Msg("Get black list IPs handler by GET /blacklist/get called")
+func (b *BlackList) GetIPs(w http.ResponseWriter, r *http.Request) {
+	b.log.Info().Msg("Get black list IPs handler by GET /auth/whitelist called")
 	common.InitHeaders(w)
 	ips, err := b.service.GetIPs()
 	if err != nil {

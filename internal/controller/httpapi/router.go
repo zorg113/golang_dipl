@@ -29,13 +29,13 @@ func NewRouter(auth *handlers.Authorization, balckList *handlers.BlackList, whit
 
 func (r *HttpApiRouter) InitRouters() {
 	r.router.HandleFunc("/auth/check", r.auth.AuthorizationHanler).Methods("POST")
-	r.router.HandleFunc("/bucket/reset", r.bucket.ResetBucket).Methods("DELETE")
-	r.router.HandleFunc("/blacklist/add", r.blackLits.AddIP).Methods("POST")
-	r.router.HandleFunc("/blacklist/get", r.blackLits.GetIPs).Methods("GET")
-	r.router.HandleFunc("/blacklist/remove", r.blackLits.DeleteIP).Methods("DELETE")
-	r.router.HandleFunc("/whitelist/add", r.whiteList.AddIP).Methods("POST")
-	r.router.HandleFunc("/whitelist/get", r.whiteList.GetIPs).Methods("GET")
-	r.router.HandleFunc("/whitelist/remove", r.whiteList.DeleteIP).Methods("DELETE")
+	r.router.HandleFunc("/auth/reset", r.bucket.ResetBucket).Methods("DELETE")
+	r.router.HandleFunc("/auth/blacklist", r.blackLits.AddIP).Methods("POST")
+	r.router.HandleFunc("/auth/blacklist", r.blackLits.GetIPs).Methods("GET")
+	r.router.HandleFunc("/auth/blacklist", r.blackLits.DeleteIP).Methods("DELETE")
+	r.router.HandleFunc("/auth/whitelist", r.whiteList.AddIP).Methods("POST")
+	r.router.HandleFunc("/auth/whitelist", r.whiteList.GetIPs).Methods("GET")
+	r.router.HandleFunc("/auth/whitelist", r.whiteList.DeleteIP).Methods("DELETE")
 }
 
 func (r *HttpApiRouter) GetRouter() *mux.Router {

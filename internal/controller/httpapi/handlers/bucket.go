@@ -19,7 +19,7 @@ func NewBucket(service *service.Authorization, log *zerolog.Logger) *Bucket {
 	return &Bucket{service: service, log: log}
 }
 func (b *Bucket) ResetBucket(w http.ResponseWriter, r *http.Request) {
-	b.log.Info().Msg("Reset bucket handler by POST /bucket/reset called")
+	b.log.Info().Msg("Reset bucket handler by POST /auth/reset called")
 	common.InitHeaders(w)
 	var request entity.Request
 	err := json.NewDecoder(r.Body).Decode(&request)

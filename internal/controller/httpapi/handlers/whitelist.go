@@ -53,7 +53,7 @@ func (wl *WhiteList) AddIP(w http.ResponseWriter, r *http.Request) {
 }
 
 func (wl *WhiteList) DeleteIP(w http.ResponseWriter, r *http.Request /* router params */) {
-	wl.log.Info().Msg("Remove IP from whitelist by DELETE /auth/whitelist/remove called")
+	wl.log.Info().Msg("Remove IP from whitelist by DELETE /auth/whitelist called")
 	common.InitHeaders(w)
 	var inIP entity.IpNetwork
 	err := json.NewDecoder(r.Body).Decode(&inIP)
