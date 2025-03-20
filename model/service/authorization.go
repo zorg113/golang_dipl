@@ -29,6 +29,8 @@ func NewAuthorization(bList *BlackList, wList *WhiteList,
 		passwordBucketStorage: passwordBucketStorage,
 		blackList:             bList,
 		whiteList:             wList,
+		conf:                  cfg,
+		log:                   logger,
 	}
 	go auth.deleteUnusedBucket()
 	return auth

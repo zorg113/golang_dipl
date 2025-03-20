@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/rs/zerolog"
+	"github.com/zorg113/golang_dipl/atibruteforce/internal/common"
 	"github.com/zorg113/golang_dipl/atibruteforce/model/entity"
 	"github.com/zorg113/golang_dipl/atibruteforce/model/service"
 )
@@ -19,7 +20,7 @@ func NewBucket(service *service.Authorization, log *zerolog.Logger) *Bucket {
 }
 func (b *Bucket) ResetBucket(w http.ResponseWriter, r *http.Request) {
 	b.log.Info().Msg("Reset bucket handler by POST /bucket/reset called")
-	initHeaders(w)
+	common.InitHeaders(w)
 	var request entity.Request
 	err := json.NewDecoder(r.Body).Decode(&request)
 	if err != nil {
@@ -28,7 +29,7 @@ func (b *Bucket) ResetBucket(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	request.Password = "empty"
-	isValidate := ValidateRequest(request)
+	isValidate := common.ValidateRequest(request)
 	if !isValidate {
 		b.log.Info().Msg("Invalid input request from client")
 		w.WriteHeader(http.StatusBadRequest)
@@ -45,9 +46,9 @@ func (b *Bucket) ResetBucket(w http.ResponseWriter, r *http.Request) {
 		b.log.Info().Msg("Failed to reset IP bucket")
 		_, err = w.Write([]byte("resetIp=false"))
 		if err != nil {
-            b.log.Error().Err(err).Msg("Failed to write response")
-            w.WriteHeader(http.StatusInternalServerError)
-        }
+			b.log.Error().Err(err).Msg("Failed to write response")
+			w.WriteHeader(http.StatusInternalServerError)
+		}
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}

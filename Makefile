@@ -7,8 +7,8 @@ gen:
 
 .PHONY: mok_gen
 mok_gen:
-	mockgen -source=model/service/blacklist.go -destination=store/adapters/mock_blacklist.go
-	mockgen -source=model/service/whitelist.go -destination=store/adapters/mock_whitelist.go
+	mockgen -source=model/service/blacklist.go -destination=store/adapters/mocks/mock_blacklist.go
+	mockgen -source=model/service/whitelist.go -destination=store/adapters/mocks/mock_whitelist.go
 
 .PHONY:clean
 clean:
@@ -53,3 +53,7 @@ migrate.down:
 .PHONY: migrate.up
 migrate.up:
 	migrate -source file://migrations -database postgres://localhost:5433/antibruteforce-service-database?sslmode=disable up
+
+.PHONY: test
+test:
+	go test -race ./...

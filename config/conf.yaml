@@ -1,6 +1,6 @@
 listen:
     Type: port
-    BindIP: 0.0.0.0
+    BindIP: 10.0.0.3
     Port: "8080"
 server:
     ReadTimeout: 10
@@ -10,12 +10,12 @@ server:
 appconfig:
     LogLevel: info
 dbdata:
-    Host: 0.0.0.0
+    Host: 10.0.0.2
     DbName: postgres
     Port: "5432"
     DbUser: postgres
     DbPassword: postgres
-    SslMode: "false"
+    SslMode: "disable"
 bucket:
     IpLimit: 1000
     LoginLimit: 10

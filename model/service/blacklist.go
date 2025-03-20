@@ -5,18 +5,18 @@ import (
 	"github.com/zorg113/golang_dipl/atibruteforce/model/entity"
 )
 
-type BlackListInterace interface {
+type BlackListStore interface {
 	AddIP(prefix, mask string) error
 	DeleteIP(Prefix, mask string) error
 	GetIPs() ([]entity.IpNetwork, error)
 }
 
 type BlackList struct {
-	stor BlackListInterace
+	stor BlackListStore
 	log  *zerolog.Logger
 }
 
-func NewBlackList(stor BlackListInterace, log *zerolog.Logger) *BlackList {
+func NewBlackList(stor BlackListStore, log *zerolog.Logger) *BlackList {
 	return &BlackList{stor: stor, log: log}
 }
 

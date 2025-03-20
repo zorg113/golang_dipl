@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/rs/zerolog"
+	"github.com/zorg113/golang_dipl/atibruteforce/internal/common"
 	"github.com/zorg113/golang_dipl/atibruteforce/model/entity"
 	"github.com/zorg113/golang_dipl/atibruteforce/model/service"
 )
@@ -20,7 +21,7 @@ func NewAuthorization(service *service.Authorization, log *zerolog.Logger) *Auth
 
 func (a *Authorization) AuthorizationHanler(w http.ResponseWriter, r *http.Request /* ps httprouter.Params*/) {
 	a.log.Info().Msg("Authorization handler by POST /auth/check/ called")
-	initHeaders(w)
+	common.InitHeaders(w)
 	var request entity.Request
 	err := json.NewDecoder(r.Body).Decode(&request)
 	if err != nil {
@@ -28,7 +29,7 @@ func (a *Authorization) AuthorizationHanler(w http.ResponseWriter, r *http.Reque
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
-	isValidate := ValidateRequest(request)
+	isValidate := common.ValidateRequest(request)
 	if !isValidate {
 		a.log.Info().Msg("Invalid input request from client")
 		w.WriteHeader(http.StatusBadRequest)

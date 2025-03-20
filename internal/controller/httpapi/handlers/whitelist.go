@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/rs/zerolog"
+	"github.com/zorg113/golang_dipl/atibruteforce/internal/common"
 	"github.com/zorg113/golang_dipl/atibruteforce/model/entity"
 	"github.com/zorg113/golang_dipl/atibruteforce/model/service"
 )
@@ -20,7 +21,7 @@ func NewWhiteList(service *service.WhiteList, log *zerolog.Logger) *WhiteList {
 
 func (wl *WhiteList) AddIP(w http.ResponseWriter, r *http.Request) {
 	wl.log.Info().Msg("Add IP in whitelist by POST /auth/whitelist")
-	initHeaders(w)
+	common.InitHeaders(w)
 	var inIP entity.IpNetwork
 	err := json.NewDecoder(r.Body).Decode(&inIP)
 	if err != nil {
@@ -28,20 +29,19 @@ func (wl *WhiteList) AddIP(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
-	if !ValidateIP(inIP) {
+	if !common.ValidateIP(inIP) {
 		wl.log.Info().Msg("Invalid IP format")
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 	err = wl.service.AddIP(inIP)
 	if err != nil {
-		if err.Error() == ipAlreadyExist.Error() {
+		if err.Error() == common.IpAlreadyExist.Error() {
 			wl.log.Info().Msg("IP already exist in white list")
 			w.WriteHeader(http.StatusBadRequest)
 			_, err = w.Write([]byte(err.Error()))
 			if err != nil {
 				wl.log.Error().Err(err).Msg("Failed to write response")
-				w.WriteHeader(http.StatusInternalServerError)
 			}
 			return
 		}
@@ -54,7 +54,7 @@ func (wl *WhiteList) AddIP(w http.ResponseWriter, r *http.Request) {
 
 func (wl *WhiteList) DeleteIP(w http.ResponseWriter, r *http.Request /* router params */) {
 	wl.log.Info().Msg("Remove IP from whitelist by DELETE /auth/whitelist/remove called")
-	initHeaders(w)
+	common.InitHeaders(w)
 	var inIP entity.IpNetwork
 	err := json.NewDecoder(r.Body).Decode(&inIP)
 	if err != nil {
@@ -62,7 +62,7 @@ func (wl *WhiteList) DeleteIP(w http.ResponseWriter, r *http.Request /* router p
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
-	if !ValidateIP(inIP) {
+	if !common.ValidateIP(inIP) {
 		wl.log.Info().Msg("Invalid IP format")
 		w.WriteHeader(http.StatusBadRequest)
 		return
@@ -78,7 +78,7 @@ func (wl *WhiteList) DeleteIP(w http.ResponseWriter, r *http.Request /* router p
 
 func (wl *WhiteList) GetIPs(w http.ResponseWriter, r *http.Request) {
 	wl.log.Info().Msg("Get white list by GET /auth/whitelist called")
-	initHeaders(w)
+	common.InitHeaders(w)
 	ipList, err := wl.service.GetIPs()
 	if err != nil {
 		wl.log.Error().Err(err).Msg("Failed to get white list")

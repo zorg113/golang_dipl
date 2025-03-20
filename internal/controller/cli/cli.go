@@ -5,7 +5,7 @@ import (
 	"strings"
 
 	"github.com/c-bata/go-prompt"
-	"github.com/zorg113/golang_dipl/atibruteforce/internal/controller/httpapi/handlers"
+	"github.com/zorg113/golang_dipl/atibruteforce/internal/common"
 	"github.com/zorg113/golang_dipl/atibruteforce/model/entity"
 	"github.com/zorg113/golang_dipl/atibruteforce/model/service"
 )
@@ -72,6 +72,7 @@ func (cli *CommandLineInterface) Run(ch chan os.Signal) {
 		}
 	}()
 	prompt.New(executer, completer).Run()
+	prompt.Input(">", completer)
 }
 func checkLenCommand(command []string, msg string) bool {
 	ret := len(command) != 4
@@ -148,7 +149,7 @@ func (cli *CommandLineInterface) bucketCommand(command []string) {
 }
 
 func (cli *CommandLineInterface) addIpToBlackList(ipNet entity.IpNetwork) {
-	isValidated := handlers.ValidateIP(ipNet)
+	isValidated := common.ValidateIP(ipNet)
 	if !isValidated {
 		println("Invalid IP or mask")
 		return
@@ -162,7 +163,7 @@ func (cli *CommandLineInterface) addIpToBlackList(ipNet entity.IpNetwork) {
 }
 
 func (cli *CommandLineInterface) deleteIpFromBlackList(ipNet entity.IpNetwork) {
-	isValidated := handlers.ValidateIP(ipNet)
+	isValidated := common.ValidateIP(ipNet)
 	if !isValidated {
 		println("Invalid IP or mask")
 		return
@@ -187,7 +188,7 @@ func (cli *CommandLineInterface) getIpsFromBlackList() {
 }
 
 func (cli *CommandLineInterface) addIpToWhiteList(ipNet entity.IpNetwork) {
-	isValidated := handlers.ValidateIP(ipNet)
+	isValidated := common.ValidateIP(ipNet)
 	if !isValidated {
 		println("Invalid IP or mask")
 		return
@@ -201,7 +202,7 @@ func (cli *CommandLineInterface) addIpToWhiteList(ipNet entity.IpNetwork) {
 }
 
 func (cli *CommandLineInterface) deleteIpFromWhiteList(ipNet entity.IpNetwork) {
-	isValidated := handlers.ValidateIP(ipNet)
+	isValidated := common.ValidateIP(ipNet)
 	if !isValidated {
 		println("Invalid IP or mask")
 		return
@@ -226,7 +227,7 @@ func (cli *CommandLineInterface) getIpsFromWhiteList() {
 }
 
 func (cli *CommandLineInterface) resetBucket(req entity.Request) {
-	isValidated := handlers.ValidateRequest(req)
+	isValidated := common.ValidateRequest(req)
 	if !isValidated {
 		println("Invalid request")
 		return

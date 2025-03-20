@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/rs/zerolog"
+	"github.com/zorg113/golang_dipl/atibruteforce/internal/common"
 	"github.com/zorg113/golang_dipl/atibruteforce/model/entity"
 	"github.com/zorg113/golang_dipl/atibruteforce/model/service"
 )
@@ -20,7 +21,7 @@ func NewBlackList(service *service.BlackList, log *zerolog.Logger) *BlackList {
 
 func (b *BlackList) AddIP(w http.ResponseWriter, r *http.Request /*router params*/) {
 	b.log.Info().Msg("Add IP to black list handler by POST /blacklist/add called")
-	initHeaders(w)
+	common.InitHeaders(w)
 	var inIP entity.IpNetwork
 	err := json.NewDecoder(r.Body).Decode(&inIP)
 	if err != nil {
@@ -28,14 +29,14 @@ func (b *BlackList) AddIP(w http.ResponseWriter, r *http.Request /*router params
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
-	if !ValidateIP(inIP) {
+	if !common.ValidateIP(inIP) {
 		b.log.Info().Msg("Invalid IP format")
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 	err = b.service.AddIP(inIP)
 	if err != nil {
-		if err.Error() == ipAlreadyExist.Error() {
+		if err.Error() == common.IpAlreadyExist.Error() {
 			b.log.Info().Msg("IP already exist in black list")
 			w.WriteHeader(http.StatusBadRequest)
 			_, err = w.Write([]byte(err.Error()))
@@ -54,7 +55,7 @@ func (b *BlackList) AddIP(w http.ResponseWriter, r *http.Request /*router params
 
 func (b *BlackList) DeleteIP(w http.ResponseWriter, r *http.Request /* router params */) {
 	b.log.Info().Msg("Remove IP from black list handler by DELETE /blacklist/remove called")
-	initHeaders(w)
+	common.InitHeaders(w)
 	var inIP entity.IpNetwork
 	err := json.NewDecoder(r.Body).Decode(&inIP)
 	if err != nil {
@@ -62,7 +63,7 @@ func (b *BlackList) DeleteIP(w http.ResponseWriter, r *http.Request /* router pa
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
-	if !ValidateIP(inIP) {
+	if !common.ValidateIP(inIP) {
 		b.log.Info().Msg("Invalid IP format")
 		w.WriteHeader(http.StatusBadRequest)
 		return
@@ -78,7 +79,7 @@ func (b *BlackList) DeleteIP(w http.ResponseWriter, r *http.Request /* router pa
 
 func (b *BlackList) GetIPs(w http.ResponseWriter, r *http.Request /* router params */) {
 	b.log.Info().Msg("Get black list IPs handler by GET /blacklist/get called")
-	initHeaders(w)
+	common.InitHeaders(w)
 	ips, err := b.service.GetIPs()
 	if err != nil {
 		b.log.Error().Err(err).Msg("Failed to get black list IPs")

@@ -5,8 +5,8 @@ import (
 	"errors"
 
 	"github.com/rs/zerolog"
+	"github.com/zorg113/golang_dipl/atibruteforce/internal/common"
 	"github.com/zorg113/golang_dipl/atibruteforce/internal/controller/grpcapi/authorizationpb"
-	"github.com/zorg113/golang_dipl/atibruteforce/internal/controller/httpapi/handlers"
 	"github.com/zorg113/golang_dipl/atibruteforce/model/entity"
 	"github.com/zorg113/golang_dipl/atibruteforce/model/service"
 )
@@ -28,7 +28,7 @@ func (s *AuthorizationServer) Authorization(ctx context.Context, in *authorizati
 		Password: in.GetRequest().GetPassword(),
 		Ip:       in.GetRequest().GetIp(),
 	}
-	if !handlers.ValidateRequest(req) {
+	if !common.ValidateRequest(req) {
 		return nil, errors.New("Invalid authorization request")
 	}
 	isAllowed, err := s.service.Authorization(req)

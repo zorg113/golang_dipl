@@ -8,8 +8,8 @@ import (
 
 func TestOpenConfig(t *testing.T) {
 	var conf Config
-	conf, err := NewConfig("config.yaml")
+	conf, err := NewConfig("./../../config/conf.yaml")
 	require.NoError(t, err)
-	require.Equal(t, "HiWorld", conf.DbData.DbPassword)
+	require.Equal(t, "postgres", conf.DbData.DbPassword)
 
 }
