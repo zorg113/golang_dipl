@@ -23,10 +23,10 @@ func NewBlackListServer(service *service.BlackList, log *zerolog.Logger) *BlackL
 	return &BlackListServer{service: service, log: log}
 }
 
-func (s *BlackListServer) AddIP(ctx context.Context, in *blacklistpb.AddIpRequest) (*blacklistpb.AddIpResponse, error) {
+func (s *BlackListServer) AddIP(_ context.Context, in *blacklistpb.AddIpRequest) (*blacklistpb.AddIpResponse, error) {
 	s.log.Info().Msg("add IP to blacklist by GRPC")
-	ipNetwork := entity.IpNetwork{
-		Ip:   in.GetIpNetwork().GetIp(),
+	ipNetwork := entity.IPNetwork{
+		IP:   in.GetIpNetwork().GetIp(),
 		Mask: in.GetIpNetwork().GetMask(),
 	}
 	idValideted := common.ValidateIP(ipNetwork)
@@ -42,10 +42,10 @@ func (s *BlackListServer) AddIP(ctx context.Context, in *blacklistpb.AddIpReques
 	return &blacklistpb.AddIpResponse{IsAddIp: true}, nil
 }
 
-func (s *BlackListServer) RemoveIp(ctx context.Context, req *blacklistpb.RemoveIPRequest) (*blacklistpb.RemoveIPResponse, error) {
+func (s *BlackListServer) RemoveIP(_ context.Context, req *blacklistpb.RemoveIPRequest) (*blacklistpb.RemoveIPResponse, error) { //nolint:lll
 	s.log.Info().Msg("removing IP address from blacklist GRPC")
-	ipNetwork := entity.IpNetwork{
-		Ip:   req.GetIpNetwork().GetIp(),
+	ipNetwork := entity.IPNetwork{
+		IP:   req.GetIpNetwork().GetIp(),
 		Mask: req.GetIpNetwork().GetMask(),
 	}
 	idValideted := common.ValidateIP(ipNetwork)
@@ -61,7 +61,7 @@ func (s *BlackListServer) RemoveIp(ctx context.Context, req *blacklistpb.RemoveI
 	return &blacklistpb.RemoveIPResponse{IsRemoveIp: true}, nil
 }
 
-func (s *BlackListServer) GetIPs(ctx context.Context, stream blacklistpb.BlackListService_GetIpListServer) error {
+func (s *BlackListServer) GetIPs(_ context.Context, stream blacklistpb.BlackListService_GetIpListServer) error {
 	s.log.Info().Msg("getting IP addresses from blacklist GRPC")
 	ips, err := s.service.GetIPs()
 	if err != nil {
@@ -70,7 +70,7 @@ func (s *BlackListServer) GetIPs(ctx context.Context, stream blacklistpb.BlackLi
 	}
 	for _, net := range ips {
 		err := stream.Send(&blacklistpb.GetIpListResponse{IpNetwork: &blacklistpb.IpNetwork{
-			Ip:   net.Ip,
+			Ip:   net.IP,
 			Mask: net.Mask,
 		}})
 		if err != nil {

@@ -6,7 +6,7 @@ import (
 	"github.com/zorg113/golang_dipl/atibruteforce/internal/controller/httpapi/handlers"
 )
 
-type HttpApiRouter struct {
+type HTTPAPIRouter struct { //nolint:revive
 	router    *mux.Router
 	auth      *handlers.Authorization
 	blackLits *handlers.BlackList
@@ -15,9 +15,9 @@ type HttpApiRouter struct {
 	log       *zerolog.Logger
 }
 
-func NewRouter(auth *handlers.Authorization, balckList *handlers.BlackList, whiteList *handlers.WhiteList, bucket *handlers.Bucket, log *zerolog.Logger) *HttpApiRouter {
+func NewHTTPAPIRouter(auth *handlers.Authorization, balckList *handlers.BlackList, whiteList *handlers.WhiteList, bucket *handlers.Bucket, log *zerolog.Logger) *HTTPAPIRouter { //nolint:lll
 	router := mux.NewRouter()
-	return &HttpApiRouter{
+	return &HTTPAPIRouter{
 		router:    router,
 		auth:      auth,
 		blackLits: balckList,
@@ -27,7 +27,7 @@ func NewRouter(auth *handlers.Authorization, balckList *handlers.BlackList, whit
 	}
 }
 
-func (r *HttpApiRouter) InitRouters() {
+func (r *HTTPAPIRouter) InitRouters() {
 	r.router.HandleFunc("/auth/check", r.auth.AuthorizationHanler).Methods("POST")
 	r.router.HandleFunc("/auth/reset", r.bucket.ResetBucket).Methods("DELETE")
 	r.router.HandleFunc("/auth/blacklist", r.blackLits.AddIP).Methods("POST")
@@ -38,6 +38,6 @@ func (r *HttpApiRouter) InitRouters() {
 	r.router.HandleFunc("/auth/whitelist", r.whiteList.DeleteIP).Methods("DELETE")
 }
 
-func (r *HttpApiRouter) GetRouter() *mux.Router {
+func (r *HTTPAPIRouter) GetRouter() *mux.Router {
 	return r.router
 }

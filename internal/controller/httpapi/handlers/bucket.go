@@ -16,8 +16,12 @@ type Bucket struct {
 }
 
 func NewBucket(service *service.Authorization, log *zerolog.Logger) *Bucket {
-	return &Bucket{service: service, log: log}
+	return &Bucket{
+		service: service,
+		log:     log,
+	}
 }
+
 func (b *Bucket) ResetBucket(w http.ResponseWriter, r *http.Request) {
 	b.log.Info().Msg("Reset bucket handler by POST /auth/reset called")
 	common.InitHeaders(w)
@@ -41,8 +45,8 @@ func (b *Bucket) ResetBucket(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
-	isIpReset := b.service.ResetIpBucket(request.Ip)
-	if !isIpReset {
+	isIPReset := b.service.ResetIPBucket(request.IP)
+	if !isIPReset {
 		b.log.Info().Msg("Failed to reset IP bucket")
 		_, err = w.Write([]byte("resetIp=false"))
 		if err != nil {

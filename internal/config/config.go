@@ -8,41 +8,41 @@ import (
 )
 
 type Listen struct {
-	Type   string `yaml:"Type"`
-	BindIP string `yaml:"BindIP"`
-	Port   string `yaml:"Port"`
+	Type   string `yaml:"type"`
+	BindIP string `yaml:"bindIp"`
+	Port   string `yaml:"port"`
 }
 
 type Server struct {
-	ReadTimeout  int    `yaml:"ReadTimeout"`
-	WriteTimeout int    `yaml:"WriteTimeout"`
-	IdleTimeout  int    `yaml:"IdleTimeout"`
-	ServerType   string `yaml:"ServerType"`
+	ReadTimeout  int    `yaml:"readTimeout"`
+	WriteTimeout int    `yaml:"writeTimeout"`
+	IdleTimeout  int    `yaml:"idleTimeout"`
+	ServerType   string `yaml:"serverType"`
 }
 
 type AppConfig struct {
-	LogLevel string `yaml:"LogLevel"`
+	LogLevel string `yaml:"logLevel"`
 }
 
-type DbData struct {
-	Host       string `yaml:"Host"`
-	DbName     string `yaml:"DbName"`
-	Port       string `yaml:"Port"`
-	DbUser     string `yaml:"DbUser"`
-	DbPassword string `yaml:"DbPassword"`
-	SslMode    string `yaml:"SslMode"`
+type DBData struct {
+	Host       string `yaml:"host"`
+	DBName     string `yaml:"dbName"`
+	Port       string `yaml:"port"`
+	DBUser     string `yaml:"dbUser"`
+	DBPassword string `yaml:"dbPassword"`
+	SslMode    string `yaml:"sslMode"`
 }
 type Bucket struct {
-	IpLimit             int `yaml:"IpLimit"`
-	LoginLimit          int `yaml:"LoginLimit"`
-	PasswordLimit       int `yaml:"PasswordLimit"`
-	ResetBucketInterval int `yaml:"ResetBucketInterval"`
+	IPLimit             int `yaml:"ipLimit"`
+	LoginLimit          int `yaml:"loginLimit"`
+	PasswordLimit       int `yaml:"passwordLimit"`
+	ResetBucketInterval int `yaml:"resetBucketInterval"`
 }
 type Config struct {
 	Listen    Listen
 	Server    Server
 	AppConfig AppConfig
-	DbData    DbData
+	DBData    DBData
 	Bucket    Bucket
 }
 

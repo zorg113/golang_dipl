@@ -26,5 +26,5 @@ func main() {
 	fmt.Println("init logger")
 	logger := zerolog.New(os.Stderr).With().Timestamp().Logger()
 	app := app.NewAntiBruteForceApp(&logger, &conf)
-	app.StartAppApi()
+	app.StartAppAPI()
 }

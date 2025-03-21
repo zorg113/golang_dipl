@@ -19,12 +19,12 @@ type Authorization struct {
 	log                   *zerolog.Logger
 }
 
-func NewAuthorization(bList *BlackList, wList *WhiteList,
-	cfg *config.Config, logger *zerolog.Logger) *Authorization {
+func NewAuthorization(bList *BlackList, wList *WhiteList, cfg *config.Config, logger *zerolog.Logger) *Authorization {
 	ipBucketStorage := make(map[string]*RateLimiter)
 	loginBucketStorage := make(map[string]*RateLimiter)
 	passwordBucketStorage := make(map[string]*RateLimiter)
-	auth := &Authorization{ipBucketStorage: ipBucketStorage,
+	auth := &Authorization{
+		ipBucketStorage:       ipBucketStorage,
 		loginBucketStorage:    loginBucketStorage,
 		passwordBucketStorage: passwordBucketStorage,
 		blackList:             bList,
@@ -42,11 +42,11 @@ func (a *Authorization) Authorization(request entity.Request) (bool, error) {
 	if err != nil {
 		return false, err
 	}
-	isIpInBlackList, err := a.checkIpByNetworkList(request.Ip, ipNetworkList)
+	isIPInBlackList, err := a.checkIPByNetworkList(request.IP, ipNetworkList)
 	if err != nil {
 		return false, err
 	}
-	if isIpInBlackList {
+	if isIPInBlackList {
 		return false, nil
 	}
 	a.log.Info().Msg("Check login in white list")
@@ -54,7 +54,7 @@ func (a *Authorization) Authorization(request entity.Request) (bool, error) {
 	if err != nil {
 		return false, err
 	}
-	isLoginInWhiteList, err := a.checkIpByNetworkList(request.Login, ipNetworkList)
+	isLoginInWhiteList, err := a.checkIPByNetworkList(request.IP, ipNetworkList)
 	if err != nil {
 		return false, err
 	}
@@ -63,7 +63,7 @@ func (a *Authorization) Authorization(request entity.Request) (bool, error) {
 	}
 	a.log.Info().Msg("Check ip in bucket")
 	isAllow := true
-	allow := a.getPermissionInBucket(request.Ip, a.ipBucketStorage, a.conf.Bucket.IpLimit)
+	allow := a.getPermissionInBucket(request.IP, a.ipBucketStorage, a.conf.Bucket.IPLimit)
 	if !allow {
 		isAllow = false
 	}
@@ -85,13 +85,13 @@ func (a *Authorization) newBucket(limit int) *RateLimiter {
 	return r
 }
 
-func (a *Authorization) checkIpByNetworkList(ip string, ipNetworkList []entity.IpNetwork) (bool, error) {
+func (a *Authorization) checkIPByNetworkList(ip string, ipNetworkList []entity.IPNetwork) (bool, error) {
 	for _, network := range ipNetworkList {
-		prefix, err := GetPrefix(network.Ip, network.Mask)
+		prefix, err := GetPrefix(ip, network.Mask)
 		if err != nil {
 			return false, err
 		}
-		if prefix == network.Ip {
+		if prefix == network.IP {
 			return true, nil
 		}
 	}
@@ -118,7 +118,7 @@ func (a *Authorization) ResetLoginInBucket(login string) bool {
 	return true
 }
 
-func (a *Authorization) ResetIpBucket(ip string) bool {
+func (a *Authorization) ResetIPBucket(ip string) bool {
 	_, ok := a.ipBucketStorage[ip]
 	if !ok {
 		return false

@@ -26,19 +26,15 @@ type ServerGRPC struct {
 	log                 *zerolog.Logger
 }
 
-func NewServerGRPC(authorizationServer authorizationpb.AuthorizationServer,
-	blacklistServer blacklistpb.BlackListServiceServer,
-	whitelistServer whitelistpb.WhiteListServiceServer,
-	bucketServer bucketpb.BucketServiceServer,
-	config *config.Config,
-	log *zerolog.Logger) *ServerGRPC {
-	return &ServerGRPC{authorizationServer: authorizationServer,
-		blacklistServer: blacklistServer,
-		whitelistServer: whitelistServer,
-		bucketServer:    bucketServer,
-		grpcServer:      grpc.NewServer(),
-		config:          config,
-		log:             log,
+func NewServerGRPC(authorizationServer authorizationpb.AuthorizationServer, blacklistServer blacklistpb.BlackListServiceServer, whitelistServer whitelistpb.WhiteListServiceServer, bucketServer bucketpb.BucketServiceServer, config *config.Config, log *zerolog.Logger) *ServerGRPC { //nolint:lll
+	return &ServerGRPC{
+		authorizationServer: authorizationServer,
+		blacklistServer:     blacklistServer,
+		whitelistServer:     whitelistServer,
+		bucketServer:        bucketServer,
+		grpcServer:          grpc.NewServer(),
+		config:              config,
+		log:                 log,
 	}
 }
 

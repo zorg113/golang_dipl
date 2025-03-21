@@ -17,12 +17,16 @@ type WhiteListServer struct {
 }
 
 func NewWhiteListServer(service *service.WhiteList, log *zerolog.Logger) *WhiteListServer {
-	return &WhiteListServer{service: service, log: log}
+	return &WhiteListServer{
+		service: service,
+		log:     log,
+	}
 }
-func (s *WhiteListServer) AddIp(ctx context.Context, req *whitelistpb.AddIpRequest) (*whitelistpb.AddIpResponse, error) {
+
+func (s *WhiteListServer) AddIP(_ context.Context, req *whitelistpb.AddIpRequest) (*whitelistpb.AddIpResponse, error) { //nolint:lll
 	s.log.Info().Msg("add ip to whitelist GRPC")
-	ipNetwork := entity.IpNetwork{
-		Ip:   req.GetIpNetwork().GetIp(),
+	ipNetwork := entity.IPNetwork{
+		IP:   req.GetIpNetwork().GetIp(),
 		Mask: req.GetIpNetwork().GetMask(),
 	}
 	if !common.ValidateIP(ipNetwork) {
@@ -37,10 +41,10 @@ func (s *WhiteListServer) AddIp(ctx context.Context, req *whitelistpb.AddIpReque
 	return &whitelistpb.AddIpResponse{IsAddIp: true}, nil
 }
 
-func (s *WhiteListServer) RemoveIp(ctx context.Context, req *whitelistpb.RemoveIPRequest) (*whitelistpb.RemoveIPResponse, error) {
+func (s *WhiteListServer) RemoveIP(_ context.Context, req *whitelistpb.RemoveIPRequest) (*whitelistpb.RemoveIPResponse, error) { //nolint:lll
 	s.log.Info().Msg("removing IP from whitelist GRPC")
-	ipNetwork := entity.IpNetwork{
-		Ip:   req.GetIpNetwork().GetIp(),
+	ipNetwork := entity.IPNetwork{
+		IP:   req.GetIpNetwork().GetIp(),
 		Mask: req.GetIpNetwork().GetMask(),
 	}
 	if !common.ValidateIP(ipNetwork) {
@@ -55,7 +59,7 @@ func (s *WhiteListServer) RemoveIp(ctx context.Context, req *whitelistpb.RemoveI
 	return &whitelistpb.RemoveIPResponse{IsRemoveIp: true}, nil
 }
 
-func (s *WhiteListServer) GetIPs(ctx context.Context, stream whitelistpb.WhiteListService_GetIpListServer) error {
+func (s *WhiteListServer) GetIPs(_ context.Context, stream whitelistpb.WhiteListService_GetIpListServer) error {
 	s.log.Info().Msg("getting IP addresses from whitelist GRPC")
 	ips, err := s.service.GetIPs()
 	if err != nil {
@@ -64,7 +68,7 @@ func (s *WhiteListServer) GetIPs(ctx context.Context, stream whitelistpb.WhiteLi
 	}
 	for _, net := range ips {
 		ip := &whitelistpb.IpNetwork{
-			Ip:   net.Ip,
+			Ip:   net.IP,
 			Mask: net.Mask,
 		}
 		err := stream.Send(&whitelistpb.GetIpListResponse{IpNetwork: ip})

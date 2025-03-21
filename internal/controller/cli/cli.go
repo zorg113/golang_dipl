@@ -18,7 +18,7 @@ var suggestions = []prompt.Suggest{
 	{Text: "whitelist add [ip_address] [mask]", Description: "Add a whitelisted IP address"},
 	{Text: "whitelist remove [ip_address] [mask]", Description: "Remove a whitelisted IP address"},
 	{Text: "whitelist get", Description: "Get all whitelisted IP addresses"},
-	{Text: "bucket remove [login] [ip_address]", Description: "Remove login and ip adress from bucket"},
+	{Text: "bucket remove [login] [ip_address]", Description: "Remove login and ip address from bucket"},
 	{Text: "help", Description: "show list commands"},
 	{Text: "exit", Description: "Exit the program"},
 }
@@ -29,7 +29,7 @@ type CommandLineInterface struct {
 	serviceWhiteList *service.WhiteList
 }
 
-func NewCommandLineInterface(serviceAuth *service.Authorization, serviceBlackList *service.BlackList, serviceWhiteList *service.WhiteList) *CommandLineInterface {
+func NewCommandLineInterface(serviceAuth *service.Authorization, serviceBlackList *service.BlackList, serviceWhiteList *service.WhiteList) *CommandLineInterface { //nolint:lll
 	return &CommandLineInterface{
 		serviceAuth:      serviceAuth,
 		serviceBlackList: serviceBlackList,
@@ -74,6 +74,7 @@ func (cli *CommandLineInterface) Run(ch chan os.Signal) {
 	}()
 	prompt.New(executer, completer).Run()
 }
+
 func checkLenCommand(command []string, msg string) bool {
 	ret := len(command) == 4
 	if !ret {
@@ -88,21 +89,21 @@ func (cli *CommandLineInterface) blackListCommand(command []string) {
 		if !checkLenCommand(command, "blacklist add [ip_address] [mask]") {
 			return
 		}
-		cli.addIpToBlackList(
-			entity.IpNetwork{
-				Ip:   command[2],
+		cli.addIPToBlackList(
+			entity.IPNetwork{
+				IP:   command[2],
 				Mask: command[3],
 			})
 	case "remove":
 		if !checkLenCommand(command, "blacklist remove [ip_address] [mask]") {
 			return
 		}
-		cli.deleteIpFromBlackList(entity.IpNetwork{
-			Ip:   command[2],
+		cli.deleteIPFromBlackList(entity.IPNetwork{
+			IP:   command[2],
 			Mask: command[3],
 		})
 	case "get":
-		cli.getIpsFromBlackList()
+		cli.getIPsFromBlackList()
 	default:
 		println("Invalid command")
 	}
@@ -114,16 +115,16 @@ func (cli *CommandLineInterface) whiteListCommand(command []string) {
 		if !checkLenCommand(command, "whitelist add [ip_address] [mask]") {
 			return
 		}
-		cli.addIpToWhiteList(entity.IpNetwork{
-			Ip:   command[2],
+		cli.addIPToWhiteList(entity.IPNetwork{
+			IP:   command[2],
 			Mask: command[3],
 		})
 	case "remove":
 		if !checkLenCommand(command, "whitelist remove [ip_address] [mask]") {
 			return
 		}
-		cli.deleteIpFromWhiteList(entity.IpNetwork{
-			Ip:   command[2],
+		cli.deleteIPFromWhiteList(entity.IPNetwork{
+			IP:   command[2],
 			Mask: command[3],
 		})
 	case "get":
@@ -141,14 +142,14 @@ func (cli *CommandLineInterface) bucketCommand(command []string) {
 		}
 		cli.resetBucket(entity.Request{
 			Login: command[2],
-			Ip:    command[3],
+			IP:    command[3],
 		})
 	default:
 		println("Invalid command")
 	}
 }
 
-func (cli *CommandLineInterface) addIpToBlackList(ipNet entity.IpNetwork) {
+func (cli *CommandLineInterface) addIPToBlackList(ipNet entity.IPNetwork) {
 	isValidated := common.ValidateIP(ipNet)
 	if !isValidated {
 		println("Invalid IP or mask")
@@ -162,7 +163,7 @@ func (cli *CommandLineInterface) addIpToBlackList(ipNet entity.IpNetwork) {
 	println("IP address added to black list")
 }
 
-func (cli *CommandLineInterface) deleteIpFromBlackList(ipNet entity.IpNetwork) {
+func (cli *CommandLineInterface) deleteIPFromBlackList(ipNet entity.IPNetwork) {
 	isValidated := common.ValidateIP(ipNet)
 	if !isValidated {
 		println("Invalid IP or mask")
@@ -176,18 +177,18 @@ func (cli *CommandLineInterface) deleteIpFromBlackList(ipNet entity.IpNetwork) {
 	println("IP address removed from black list")
 }
 
-func (cli *CommandLineInterface) getIpsFromBlackList() {
+func (cli *CommandLineInterface) getIPsFromBlackList() {
 	ips, err := cli.serviceBlackList.GetIPs()
 	if err != nil {
 		println(err.Error())
 		return
 	}
 	for _, ip := range ips {
-		fmt.Printf("ip:%s mask:%s\n", ip.Ip, ip.Mask)
+		fmt.Printf("ip:%s mask:%s\n", ip.IP, ip.Mask)
 	}
 }
 
-func (cli *CommandLineInterface) addIpToWhiteList(ipNet entity.IpNetwork) {
+func (cli *CommandLineInterface) addIPToWhiteList(ipNet entity.IPNetwork) {
 	isValidated := common.ValidateIP(ipNet)
 	if !isValidated {
 		println("Invalid IP or mask")
@@ -201,7 +202,7 @@ func (cli *CommandLineInterface) addIpToWhiteList(ipNet entity.IpNetwork) {
 	println("IP address added to whitelist")
 }
 
-func (cli *CommandLineInterface) deleteIpFromWhiteList(ipNet entity.IpNetwork) {
+func (cli *CommandLineInterface) deleteIPFromWhiteList(ipNet entity.IPNetwork) {
 	isValidated := common.ValidateIP(ipNet)
 	if !isValidated {
 		println("Invalid IP or mask")
@@ -222,7 +223,7 @@ func (cli *CommandLineInterface) getIpsFromWhiteList() {
 		return
 	}
 	for _, ip := range ips {
-		fmt.Printf("ip:%s mask:%s\n", ip.Ip, ip.Mask)
+		fmt.Printf("ip:%s mask:%s\n", ip.IP, ip.Mask)
 	}
 }
 
@@ -232,12 +233,12 @@ func (cli *CommandLineInterface) resetBucket(req entity.Request) {
 		println("Invalid request")
 		return
 	}
-	isReset := cli.serviceAuth.ResetIpBucket(req.Ip)
+	isReset := cli.serviceAuth.ResetIPBucket(req.IP)
 	if !isReset {
 		println("ip address not find")
 		return
 	}
-	println("Bucket reset for IP address: " + req.Ip)
+	println("Bucket reset for IP address: " + req.IP)
 	isReset = cli.serviceAuth.ResetLoginInBucket(req.Login)
 	if !isReset {
 		println("login not find")

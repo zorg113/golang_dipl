@@ -1,3 +1,4 @@
+//nolint:dupl
 package adapters
 
 import (
@@ -14,23 +15,23 @@ const (
 )
 
 type WhiteListStorage struct {
-	client *client.PostgresSql
+	client *client.PostgresSQL
 }
 
-func NewWhiteListStorage(client *client.PostgresSql) *WhiteListStorage {
+func NewWhiteListStorage(client *client.PostgresSQL) *WhiteListStorage {
 	return &WhiteListStorage{client: client}
 }
 
 func (w *WhiteListStorage) AddIP(prefix, mask string) error {
 	var isExist bool
-	err := w.client.Db.QueryRow(isIPExistWiteList, prefix, mask).Scan(&isExist)
+	err := w.client.DB.QueryRow(isIPExistWiteList, prefix, mask).Scan(&isExist)
 	if err != nil {
 		return err
 	}
 	if isExist {
-		return common.IpAlreadyExist
+		return common.IPAlreadyExist
 	}
-	err = w.client.Db.QueryRow(insertIPInWiteList, prefix, mask).Err()
+	err = w.client.DB.QueryRow(insertIPInWiteList, prefix, mask).Err()
 	if err != nil {
 		return err
 	}
@@ -38,16 +39,16 @@ func (w *WhiteListStorage) AddIP(prefix, mask string) error {
 }
 
 func (w *WhiteListStorage) DeleteIP(prefix, mask string) error {
-	err := w.client.Db.QueryRow(deleteIPFromWhiteList, prefix, mask).Err()
+	err := w.client.DB.QueryRow(deleteIPFromWhiteList, prefix, mask).Err()
 	if err != nil {
 		return err
 	}
 	return nil
 }
 
-func (w *WhiteListStorage) GetIPs() ([]entity.IpNetwork, error) {
-	ipNetworkList := make([]entity.IpNetwork, 0, 5)
-	err := w.client.Db.Select(&ipNetworkList, getAllIPFromWhiteList)
+func (w *WhiteListStorage) GetIPs() ([]entity.IPNetwork, error) {
+	ipNetworkList := make([]entity.IPNetwork, 0, 5)
+	err := w.client.DB.Select(&ipNetworkList, getAllIPFromWhiteList)
 	if err != nil {
 		return nil, err
 	}

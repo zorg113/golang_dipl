@@ -9,7 +9,8 @@ import (
 )
 
 var validatePattern *regexp.Regexp
-var IpAlreadyExist = errors.New("IP address already exists")
+
+var IPAlreadyExist = errors.New("IP address already exists") //nolint:revive,stylecheck
 
 func init() {
 	validatePattern = regexp.MustCompile(`(?m)^((25[0-5]|(2[0-4]|1\d|[1-9]|)\d)\.?\b){4}$`)
@@ -19,8 +20,8 @@ func InitHeaders(rw http.ResponseWriter) {
 	rw.Header().Set("Content-Type", "application/json")
 }
 
-func ValidateIP(network entity.IpNetwork) bool {
-	if !isCorrectIP(network.Ip) || !isCorrectMask(network.Mask) {
+func ValidateIP(network entity.IPNetwork) bool {
+	if !isCorrectIP(network.IP) || !isCorrectMask(network.Mask) {
 		return false
 	}
 	return true
@@ -38,7 +39,7 @@ func ValidateRequest(request entity.Request) bool {
 	if request.Login == "" || request.Password == "" {
 		return false
 	}
-	if !isCorrectIP(request.Ip) {
+	if !isCorrectIP(request.IP) {
 		return false
 	}
 	return true

@@ -12,22 +12,22 @@ import (
 	"github.com/zorg113/golang_dipl/atibruteforce/internal/config"
 )
 
-type HttpApiServer struct {
+type HTTPAPIServer struct { //nolint:revive
 	server  *http.Server
 	handler http.Handler
 	config  *config.Config
 	logger  *zerolog.Logger
 }
 
-func NewHttpApiServer(handler http.Handler, config *config.Config, log *zerolog.Logger) *HttpApiServer {
-	return &HttpApiServer{
+func NewHTTPAPIServer(handler http.Handler, config *config.Config, log *zerolog.Logger) *HTTPAPIServer {
+	return &HTTPAPIServer{
 		config:  config,
 		handler: handler,
 		logger:  log,
 	}
 }
 
-func (srv *HttpApiServer) Start() error {
+func (srv *HTTPAPIServer) Start() error {
 	srv.server = &http.Server{
 		Addr:         srv.config.Listen.BindIP + ":" + srv.config.Listen.Port,
 		Handler:      srv.handler,
@@ -40,7 +40,7 @@ func (srv *HttpApiServer) Start() error {
 	return err
 }
 
-func (srv *HttpApiServer) ShutdowService(c chan os.Signal) {
+func (srv *HTTPAPIServer) ShutdowService(c chan os.Signal) {
 	signal.Notify(c, os.Interrupt)
 	signal.Notify(c, syscall.SIGTERM)
 	sig := <-c

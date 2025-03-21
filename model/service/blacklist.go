@@ -1,3 +1,4 @@
+//nolint:dupl
 package service
 
 import (
@@ -8,7 +9,7 @@ import (
 type BlackListStore interface {
 	AddIP(prefix, mask string) error
 	DeleteIP(Prefix, mask string) error
-	GetIPs() ([]entity.IpNetwork, error)
+	GetIPs() ([]entity.IPNetwork, error)
 }
 
 type BlackList struct {
@@ -20,8 +21,8 @@ func NewBlackList(stor BlackListStore, log *zerolog.Logger) *BlackList {
 	return &BlackList{stor: stor, log: log}
 }
 
-func (b *BlackList) AddIP(network entity.IpNetwork) error {
-	prefix, err := GetPrefix(network.Ip, network.Mask)
+func (b *BlackList) AddIP(network entity.IPNetwork) error {
+	prefix, err := GetPrefix(network.IP, network.Mask)
 	if err != nil {
 		return err
 	}
@@ -32,8 +33,8 @@ func (b *BlackList) AddIP(network entity.IpNetwork) error {
 	return nil
 }
 
-func (b *BlackList) DeleteIP(network entity.IpNetwork) error {
-	prefix, err := GetPrefix(network.Ip, network.Mask)
+func (b *BlackList) DeleteIP(network entity.IPNetwork) error {
+	prefix, err := GetPrefix(network.IP, network.Mask)
 	if err != nil {
 		return err
 	}
@@ -44,7 +45,7 @@ func (b *BlackList) DeleteIP(network entity.IpNetwork) error {
 	return nil
 }
 
-func (b *BlackList) GetIPs() ([]entity.IpNetwork, error) {
+func (b *BlackList) GetIPs() ([]entity.IPNetwork, error) {
 	ips, err := b.stor.GetIPs()
 	if err != nil {
 		return nil, err

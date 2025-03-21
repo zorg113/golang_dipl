@@ -21,15 +21,15 @@ func NewAuthorization(service *service.Authorization, log *zerolog.Logger) *Auth
 	return &AuthorizationServer{service: service, log: log}
 }
 
-func (s *AuthorizationServer) Authorization(ctx context.Context, in *authorizationpb.AuthorizationRequest) (*authorizationpb.AuthorizationResponse, error) {
+func (s *AuthorizationServer) Authorization(_ context.Context, in *authorizationpb.AuthorizationRequest) (*authorizationpb.AuthorizationResponse, error) { //nolint:lll
 	s.log.Info().Msgf("Authorization request GRPC")
 	req := entity.Request{
 		Login:    in.GetRequest().GetLogin(),
 		Password: in.GetRequest().GetPassword(),
-		Ip:       in.GetRequest().GetIp(),
+		IP:       in.GetRequest().GetIp(),
 	}
 	if !common.ValidateRequest(req) {
-		return nil, errors.New("Invalid authorization request")
+		return nil, errors.New("invalid authorization request")
 	}
 	isAllowed, err := s.service.Authorization(req)
 	if err != nil {

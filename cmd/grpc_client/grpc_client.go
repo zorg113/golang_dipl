@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"io"
 
@@ -21,7 +22,7 @@ func main() {
 	}
 
 	trn := grpc.WithTransportCredentials(insecure.NewCredentials())
-	dial, err := grpc.Dial(conf.Listen.BindIP+":"+conf.Listen.Port, trn)
+	dial, err := grpc.NewClient(conf.Listen.BindIP+":"+conf.Listen.Port, trn)
 	if err != nil {
 		fmt.Printf("Failed to dial: %v", err)
 		return
@@ -30,9 +31,9 @@ func main() {
 	clientWhiteList := whitelistpb.NewWhiteListServiceClient(dial)
 	clientBucket := bucketpb.NewBucketServiceClient(dial)
 	clientAuthorization := authorizationpb.NewAuthorizationClient(dial)
-	getIpListInBlackList(clientBlackList)
+	getIPListInBlackList(clientBlackList)
 	fmt.Println()
-	getIpListInWhiteList(clientWhiteList)
+	getIPListInWhiteList(clientWhiteList)
 	fmt.Println()
 	resetBucket(clientBucket)
 	fmt.Println()
@@ -46,7 +47,8 @@ func execAuthorization(client authorizationpb.AuthorizationClient) {
 				Login:    "admin",
 				Password: "admin",
 				Ip:       "192.168.0.1",
-			}})
+			},
+		})
 	if err != nil {
 		fmt.Printf("Error: %v", err)
 	} else {
@@ -54,7 +56,7 @@ func execAuthorization(client authorizationpb.AuthorizationClient) {
 	}
 }
 
-func getIpListInBlackList(client blacklistpb.BlackListServiceClient) {
+func getIPListInBlackList(client blacklistpb.BlackListServiceClient) {
 	stream, err := client.GetIpList(context.Background(), &blacklistpb.GetIpListRequest{})
 	if err != nil {
 		fmt.Printf("Error: %v", err)
@@ -62,10 +64,10 @@ func getIpListInBlackList(client blacklistpb.BlackListServiceClient) {
 	}
 	for {
 		ip, err := stream.Recv()
-		if err == context.Canceled {
+		if errors.Is(err, context.Canceled) {
 			break
 		}
-		if err == io.EOF {
+		if errors.Is(err, io.EOF) {
 			break
 		}
 		if err != nil {
@@ -76,7 +78,7 @@ func getIpListInBlackList(client blacklistpb.BlackListServiceClient) {
 	}
 }
 
-func getIpListInWhiteList(client whitelistpb.WhiteListServiceClient) {
+func getIPListInWhiteList(client whitelistpb.WhiteListServiceClient) {
 	stream, err := client.GetIpList(context.Background(), &whitelistpb.GetIpListRequest{})
 	if err != nil {
 		fmt.Printf("Error: %v", err)
@@ -84,10 +86,10 @@ func getIpListInWhiteList(client whitelistpb.WhiteListServiceClient) {
 	}
 	for {
 		ip, err := stream.Recv()
-		if err == context.Canceled {
+		if errors.Is(err, context.Canceled) {
 			break
 		}
-		if err == io.EOF {
+		if errors.Is(err, io.EOF) {
 			break
 		}
 		if err != nil {
@@ -105,7 +107,8 @@ func resetBucket(client bucketpb.BucketServiceClient) {
 				Login:    "admin",
 				Password: "admin",
 				Ip:       "192.168.0.1",
-			}})
+			},
+		})
 	if err != nil {
 		fmt.Printf("Error: %v", err)
 	}

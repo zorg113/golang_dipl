@@ -1,6 +1,7 @@
 package app
 
 import (
+	"errors"
 	"net/http"
 	"os"
 
@@ -16,19 +17,19 @@ import (
 )
 
 type AntiBruteForceApp struct {
-	router                  *httpapi.HttpApiRouter
+	router                  *httpapi.HTTPAPIRouter
 	grpcBlackListServer     *grpcapi.BlackListServer
 	grpcWhiteListServer     *grpcapi.WhiteListServer
 	grpcBucketServer        *grpcapi.BucketServer
 	grpcAuthorizationServer *grpcapi.AuthorizationServer
 	cli                     *cli.CommandLineInterface
-	dbClient                *client.PostgresSql
+	dbClient                *client.PostgresSQL
 	logger                  *zerolog.Logger
 	config                  *config.Config
 }
 
 func NewAntiBruteForceApp(logger *zerolog.Logger, config *config.Config) *AntiBruteForceApp {
-	dbClient := client.NewPostgresSql(logger, config)
+	dbClient := client.NewPostgresSQL(logger, config)
 	err := dbClient.Open()
 	if err != nil {
 		logger.Fatal().Err(err).Msg("failed to connect to postgres")
@@ -49,7 +50,7 @@ func NewAntiBruteForceApp(logger *zerolog.Logger, config *config.Config) *AntiBr
 	bucketGrpc := grpcapi.NewBucketServer(authorizarionService, logger)
 	authorizationGrpc := grpcapi.NewAuthorization(authorizarionService, logger)
 
-	router := httpapi.NewRouter(authrizationHandler, blackListHandler, whiteListHandler, bucketHandler, logger)
+	router := httpapi.NewHTTPAPIRouter(authrizationHandler, blackListHandler, whiteListHandler, bucketHandler, logger)
 
 	cli := cli.NewCommandLineInterface(authorizarionService, blackListService, whiteListService)
 
@@ -66,7 +67,7 @@ func NewAntiBruteForceApp(logger *zerolog.Logger, config *config.Config) *AntiBr
 	}
 }
 
-func (a *AntiBruteForceApp) StartAppApi() {
+func (a *AntiBruteForceApp) StartAppAPI() {
 	c := make(chan os.Signal, 1)
 	go a.cli.Run(c)
 	switch a.config.Server.ServerType {
@@ -91,11 +92,11 @@ func (a *AntiBruteForceApp) StartAppApi() {
 		a.logger.Info().Msg("Init http server")
 		a.router.InitRouters()
 
-		server := httpapi.NewHttpApiServer(a.router.GetRouter(), a.config, a.logger)
+		server := httpapi.NewHTTPAPIServer(a.router.GetRouter(), a.config, a.logger)
 		go server.ShutdowService(c)
 		err := server.Start()
 		if err != nil {
-			if err == http.ErrServerClosed {
+			if errors.Is(err, http.ErrServerClosed) {
 				a.logger.Error().Err(err)
 				err = a.dbClient.Close()
 				if err != nil {
@@ -105,6 +106,5 @@ func (a *AntiBruteForceApp) StartAppApi() {
 			}
 			a.logger.Fatal().Err(err).Msg("failed to start http server")
 		}
-
 	}
 }

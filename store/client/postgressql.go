@@ -7,20 +7,20 @@ import (
 	"github.com/zorg113/golang_dipl/atibruteforce/internal/config"
 )
 
-type PostgresSql struct {
-	Db     *sqlx.DB
+type PostgresSQL struct {
+	DB     *sqlx.DB
 	cfg    *config.Config
 	logger *zerolog.Logger
 }
 
-func NewPostgresSql(log *zerolog.Logger, config *config.Config) *PostgresSql {
-	return &PostgresSql{logger: log, cfg: config}
+func NewPostgresSQL(log *zerolog.Logger, config *config.Config) *PostgresSQL {
+	return &PostgresSQL{logger: log, cfg: config}
 }
 
-func (s *PostgresSql) Open() error {
-	dbSrcName := "host=" + s.cfg.DbData.Host + " " + "dbname=" + s.cfg.DbData.DbName +
-		" " + "port=" + s.cfg.DbData.Port + " " + "user=" + s.cfg.DbData.DbUser +
-		" " + "password=" + s.cfg.DbData.DbPassword + " " + "sslmode=" + s.cfg.DbData.SslMode
+func (s *PostgresSQL) Open() error {
+	dbSrcName := "host=" + s.cfg.DBData.Host + " " + "dbname=" + s.cfg.DBData.DBName +
+		" " + "port=" + s.cfg.DBData.Port + " " + "user=" + s.cfg.DBData.DBUser +
+		" " + "password=" + s.cfg.DBData.DBPassword + " " + "sslmode=" + s.cfg.DBData.SslMode
 	s.logger.Info().Msg(dbSrcName)
 	db, err := sqlx.Open("postgres", dbSrcName)
 	if err != nil {
@@ -32,13 +32,13 @@ func (s *PostgresSql) Open() error {
 		s.logger.Fatal().Err(err).Msg("failed to ping postgres")
 		return err
 	}
-	s.Db = db
+	s.DB = db
 	s.logger.Info().Msg("connection to db successfully")
 	return nil
 }
 
-func (s *PostgresSql) Close() error {
-	err := s.Db.Close()
+func (s *PostgresSQL) Close() error {
+	err := s.DB.Close()
 	if err != nil {
 		s.logger.Fatal().Err(err).Msg("failed to close db connection")
 		return err

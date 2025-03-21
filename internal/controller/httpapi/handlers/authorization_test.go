@@ -40,17 +40,17 @@ func TestAuthorization(t *testing.T) {
 		{name: "test request", request: entity.Request{
 			Login:    "admin",
 			Password: "password",
-			Ip:       "127.0.0.1",
+			IP:       "127.0.0.1",
 		}},
 	}
-	blackListMockStor.EXPECT().GetIPs().Return([]entity.IpNetwork{}, nil).AnyTimes()
-	whiteListMockStor.EXPECT().GetIPs().Return([]entity.IpNetwork{}, nil).AnyTimes()
+	blackListMockStor.EXPECT().GetIPs().Return([]entity.IPNetwork{}, nil).AnyTimes()
+	whiteListMockStor.EXPECT().GetIPs().Return([]entity.IPNetwork{}, nil).AnyTimes()
 	router := mux.NewRouter()
 	router.HandleFunc("/auth/check", authHandler.AuthorizationHanler).Methods("POST")
 	request := cases[0].request
 	body, err := json.Marshal(request)
 	require.NoError(t, err)
-	req, err := http.NewRequest("POST", "/auth/check", bytes.NewBuffer(body))
+	req, err := http.NewRequest("POST", "/auth/check", bytes.NewBuffer(body)) //nolint: noctx
 	require.NoError(t, err)
 	req.Header.Set("Content-Type", "application/json")
 	ss := httptest.NewRecorder()
@@ -58,5 +58,4 @@ func TestAuthorization(t *testing.T) {
 	require.Equal(t, http.StatusOK, ss.Code)
 	s := ss.Body.String()
 	require.Equal(t, "ok=true", s)
-
 }

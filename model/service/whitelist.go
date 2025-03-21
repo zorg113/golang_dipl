@@ -1,3 +1,4 @@
+//nolint:dupl
 package service
 
 import (
@@ -8,7 +9,7 @@ import (
 type WhiteListStore interface {
 	AddIP(prefix, mask string) error
 	DeleteIP(prefix, mask string) error
-	GetIPs() ([]entity.IpNetwork, error)
+	GetIPs() ([]entity.IPNetwork, error)
 }
 
 type WhiteList struct {
@@ -20,8 +21,8 @@ func NewWhiteList(stor WhiteListStore, log *zerolog.Logger) *WhiteList {
 	return &WhiteList{stor: stor, log: log}
 }
 
-func (w *WhiteList) AddIP(network entity.IpNetwork) error {
-	prefix, err := GetPrefix(network.Ip, network.Mask)
+func (w *WhiteList) AddIP(network entity.IPNetwork) error {
+	prefix, err := GetPrefix(network.IP, network.Mask)
 	if err != nil {
 		return err
 	}
@@ -32,8 +33,8 @@ func (w *WhiteList) AddIP(network entity.IpNetwork) error {
 	return nil
 }
 
-func (w *WhiteList) DeleteIP(network entity.IpNetwork) error {
-	prefix, err := GetPrefix(network.Ip, network.Mask)
+func (w *WhiteList) DeleteIP(network entity.IPNetwork) error {
+	prefix, err := GetPrefix(network.IP, network.Mask)
 	if err != nil {
 		return err
 	}
@@ -44,7 +45,7 @@ func (w *WhiteList) DeleteIP(network entity.IpNetwork) error {
 	return nil
 }
 
-func (w *WhiteList) GetIPs() ([]entity.IpNetwork, error) {
+func (w *WhiteList) GetIPs() ([]entity.IPNetwork, error) {
 	ipList, err := w.stor.GetIPs()
 	if err != nil {
 		return nil, err

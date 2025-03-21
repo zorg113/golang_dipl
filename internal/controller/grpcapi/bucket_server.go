@@ -21,24 +21,24 @@ func NewBucketServer(service *service.Authorization, log *zerolog.Logger) *Bucke
 	return &BucketServer{service: service, log: log}
 }
 
-func (s *BucketServer) ResetBucket(ctx context.Context, req *bucketpb.ResetBucketRequest) (*bucketpb.ResetBucketResponse, error) {
+func (s *BucketServer) ResetBucket(_ context.Context, req *bucketpb.ResetBucketRequest) (*bucketpb.ResetBucketResponse, error) { //nolint:lll
 	s.log.Info().Msg("resetting bucket GRPC")
 	request := entity.Request{
 		Login:    req.GetRequest().GetLogin(),
 		Password: req.GetRequest().GetPassword(),
-		Ip:       req.GetRequest().GetIp(),
+		IP:       req.GetRequest().GetIp(),
 	}
 	request.Password = "empty"
 	if !common.ValidateRequest(request) {
-		return nil, errors.New("invalid input request recived")
+		return nil, errors.New("invalid input request received")
 	}
 	resp := &bucketpb.ResetBucketResponse{ResetLogin: true, ResetIp: true}
 	isLoginReset := s.service.ResetLoginInBucket(request.Login)
 	if !isLoginReset {
 		resp.ResetLogin = false
 	}
-	isIpReset := s.service.ResetIpBucket(request.Ip)
-	if !isIpReset {
+	isIPReset := s.service.ResetIPBucket(request.IP)
+	if !isIPReset {
 		resp.ResetIp = false
 	}
 	return resp, nil

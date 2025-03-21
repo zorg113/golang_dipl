@@ -23,25 +23,28 @@ func TestBlackList_AddIP(t *testing.T) {
 	controller := gomock.NewController(t)
 	defer controller.Finish()
 	mockStor := mock_service.NewMockBlackListStore(controller)
-	cases :=
-		[]struct {
-			name    string
-			network entity.IpNetwork
-		}{
-			{name: "test valid ip mask", network: entity.IpNetwork{
-				Ip:   "127.0.0.1",
+	cases := []struct {
+		name    string
+		network entity.IPNetwork
+	}{
+		{
+			name: "test valid ip mask",
+			network: entity.IPNetwork{
+				IP:   "127.0.0.1",
 				Mask: "255.255.0.0",
-			}},
-			{name: "test invalid ip mask", network: entity.IpNetwork{
-				Ip:   "127.0.0.1",
+			},
+		}, {
+			name: "test invalid ip mask",
+			network: entity.IPNetwork{
+				IP:   "127.0.0.1",
 				Mask: "256.255.0.0",
-			}},
-		}
-
+			},
+		},
+	}
 	for _, testCase := range cases {
-		prefix, _ := service.GetPrefix(testCase.network.Ip, testCase.network.Mask)
+		prefix, _ := service.GetPrefix(testCase.network.IP, testCase.network.Mask)
 		mockStor.EXPECT().AddIP(prefix, testCase.network.Mask).Return(nil).MaxTimes(1)
-		mockStor.EXPECT().AddIP(prefix, testCase.network.Mask).Return(common.IpAlreadyExist).AnyTimes()
+		mockStor.EXPECT().AddIP(prefix, testCase.network.Mask).Return(common.IPAlreadyExist).AnyTimes()
 	}
 	blackListService := service.NewBlackList(mockStor, &logger)
 	blackList := NewBlackList(blackListService, &logger)
@@ -90,23 +93,28 @@ func TestBlackList_DeleteIP(t *testing.T) {
 	controller := gomock.NewController(t)
 	defer controller.Finish()
 	mockStor := mock_service.NewMockBlackListStore(controller)
-	cases :=
-		[]struct {
-			name    string
-			network entity.IpNetwork
-		}{
-			{name: "test valid ip mask", network: entity.IpNetwork{
-				Ip:   "127.0.0.1",
+	cases := []struct {
+		name    string
+		network entity.IPNetwork
+	}{
+		{
+			name: "test valid ip mask",
+			network: entity.IPNetwork{
+				IP:   "127.0.0.1",
 				Mask: "255.255.0.0",
-			}},
-			{name: "test invalid ip mask", network: entity.IpNetwork{
-				Ip:   "127.0.0.1",
+			},
+		},
+		{
+			name: "test invalid ip mask",
+			network: entity.IPNetwork{
+				IP:   "127.0.0.1",
 				Mask: "256.255.0.0",
-			}},
-		}
+			},
+		},
+	}
 
 	for _, testCase := range cases {
-		prefix, _ := service.GetPrefix(testCase.network.Ip, testCase.network.Mask)
+		prefix, _ := service.GetPrefix(testCase.network.IP, testCase.network.Mask)
 		mockStor.EXPECT().DeleteIP(prefix, testCase.network.Mask).Return(nil).AnyTimes()
 	}
 	blackListService := service.NewBlackList(mockStor, &logger)
@@ -139,20 +147,18 @@ func TestBlackList_DeleteIP(t *testing.T) {
 	router.ServeHTTP(ss, req)
 
 	require.Equal(t, http.StatusBadRequest, ss.Code)
-
 }
 
 func TestBlackList_GetIPs(t *testing.T) {
-
 	logger := zerolog.New(os.Stderr).With().Timestamp().Logger()
 	controller := gomock.NewController(t)
 	defer controller.Finish()
 	mockStor := mock_service.NewMockBlackListStore(controller)
-	cases := []entity.IpNetwork{{
-		Ip:   "127.0.0.1",
+	cases := []entity.IPNetwork{{
+		IP:   "127.0.0.1",
 		Mask: "255.255.0.0",
 	}, {
-		Ip:   "127.9.0.1",
+		IP:   "127.9.0.1",
 		Mask: "255.255.0.0",
 	}}
 
@@ -172,7 +178,7 @@ func TestBlackList_GetIPs(t *testing.T) {
 
 	require.Equal(t, http.StatusOK, ss.Code)
 
-	var ipList []entity.IpNetwork
+	var ipList []entity.IPNetwork
 	err = json.Unmarshal(ss.Body.Bytes(), &ipList)
 	require.NoError(t, err)
 	require.Equal(t, cases, ipList)

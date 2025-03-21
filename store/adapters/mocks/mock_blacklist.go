@@ -63,10 +63,10 @@ func (mr *MockBlackListStoreMockRecorder) DeleteIP(Prefix, mask interface{}) *go
 }
 
 // GetIPs mocks base method.
-func (m *MockBlackListStore) GetIPs() ([]entity.IpNetwork, error) {
+func (m *MockBlackListStore) GetIPs() ([]entity.IPNetwork, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetIPs")
-	ret0, _ := ret[0].([]entity.IpNetwork)
+	ret0, _ := ret[0].([]entity.IPNetwork)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }

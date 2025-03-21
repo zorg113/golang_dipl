@@ -22,7 +22,7 @@ func NewWhiteList(service *service.WhiteList, log *zerolog.Logger) *WhiteList {
 func (wl *WhiteList) AddIP(w http.ResponseWriter, r *http.Request) {
 	wl.log.Info().Msg("Add IP in whitelist by POST /auth/whitelist")
 	common.InitHeaders(w)
-	var inIP entity.IpNetwork
+	var inIP entity.IPNetwork
 	err := json.NewDecoder(r.Body).Decode(&inIP)
 	if err != nil {
 		wl.log.Error().Err(err).Msg("Failed to decode request body: ")
@@ -36,7 +36,7 @@ func (wl *WhiteList) AddIP(w http.ResponseWriter, r *http.Request) {
 	}
 	err = wl.service.AddIP(inIP)
 	if err != nil {
-		if err.Error() == common.IpAlreadyExist.Error() {
+		if err.Error() == common.IPAlreadyExist.Error() {
 			wl.log.Info().Msg("IP already exist in white list")
 			w.WriteHeader(http.StatusBadRequest)
 			_, err = w.Write([]byte(err.Error()))
@@ -52,10 +52,10 @@ func (wl *WhiteList) AddIP(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusNoContent)
 }
 
-func (wl *WhiteList) DeleteIP(w http.ResponseWriter, r *http.Request /* router params */) {
+func (wl *WhiteList) DeleteIP(w http.ResponseWriter, r *http.Request) { //nolint:dupl
 	wl.log.Info().Msg("Remove IP from whitelist by DELETE /auth/whitelist called")
 	common.InitHeaders(w)
-	var inIP entity.IpNetwork
+	var inIP entity.IPNetwork
 	err := json.NewDecoder(r.Body).Decode(&inIP)
 	if err != nil {
 		wl.log.Error().Err(err).Msg("Failed to decode request body: ")
@@ -76,7 +76,7 @@ func (wl *WhiteList) DeleteIP(w http.ResponseWriter, r *http.Request /* router p
 	w.WriteHeader(http.StatusNoContent)
 }
 
-func (wl *WhiteList) GetIPs(w http.ResponseWriter, r *http.Request) {
+func (wl *WhiteList) GetIPs(w http.ResponseWriter, _ *http.Request) {
 	wl.log.Info().Msg("Get white list by GET /auth/whitelist called")
 	common.InitHeaders(w)
 	ipList, err := wl.service.GetIPs()

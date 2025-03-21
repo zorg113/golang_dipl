@@ -1,8 +1,8 @@
+//nolint:dupl
 package adapters
 
 import (
-	"fmt"
-
+	"github.com/zorg113/golang_dipl/atibruteforce/internal/common"
 	"github.com/zorg113/golang_dipl/atibruteforce/model/entity"
 	"github.com/zorg113/golang_dipl/atibruteforce/store/client"
 )
@@ -15,23 +15,23 @@ const (
 )
 
 type BlackListStorage struct {
-	client *client.PostgresSql
+	client *client.PostgresSQL
 }
 
-func NewBlackListStorage(client *client.PostgresSql) *BlackListStorage {
+func NewBlackListStorage(client *client.PostgresSQL) *BlackListStorage {
 	return &BlackListStorage{client: client}
 }
 
 func (b *BlackListStorage) AddIP(prefix, mask string) error {
 	var isExist bool
-	err := b.client.Db.QueryRow(isIPExistBlackList, prefix, mask).Scan(&isExist)
+	err := b.client.DB.QueryRow(isIPExistBlackList, prefix, mask).Scan(&isExist)
 	if err != nil {
 		return err
 	}
 	if isExist {
-		return fmt.Errorf("ip already exists in black list")
+		return common.IPAlreadyExist
 	}
-	err = b.client.Db.QueryRow(insertIPInBlackList, prefix, mask).Err()
+	err = b.client.DB.QueryRow(insertIPInBlackList, prefix, mask).Err()
 	if err != nil {
 		return err
 	}
@@ -39,16 +39,16 @@ func (b *BlackListStorage) AddIP(prefix, mask string) error {
 }
 
 func (b *BlackListStorage) DeleteIP(prefix, mask string) error {
-	err := b.client.Db.QueryRow(deleteIPFromBlackList, prefix, mask).Err()
+	err := b.client.DB.QueryRow(deleteIPFromBlackList, prefix, mask).Err()
 	if err != nil {
 		return err
 	}
 	return nil
 }
 
-func (b *BlackListStorage) GetIPs() ([]entity.IpNetwork, error) {
-	ipNetworkList := make([]entity.IpNetwork, 0, 5)
-	err := b.client.Db.Select(&ipNetworkList, getAllIPFromBlackList)
+func (b *BlackListStorage) GetIPs() ([]entity.IPNetwork, error) {
+	ipNetworkList := make([]entity.IPNetwork, 0, 5)
+	err := b.client.DB.Select(&ipNetworkList, getAllIPFromBlackList)
 	if err != nil {
 		return nil, err
 	}
