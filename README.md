@@ -4,7 +4,7 @@
      make run
 
 Подключение к консоли сервиса:
-     docker attach CONTAINER
+     docker attach conatiner_id
 
 Запуск интеграционных тестов:
      make integration.test.run
