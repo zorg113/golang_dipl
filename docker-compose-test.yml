@@ -39,16 +39,16 @@ services:
     networks:
       vpcbr:
         ipv4_address: 10.0.0.3
-  # server2:
-  #   container_name: python-request
-  #   image: python-request
-  #   depends_on:
-  #     - server        
-  #   networks:
-  #     vpcbr:
-  #       ipv4_address: 10.0.0.4
-  #   build:      
-  #     dockerfile: ./pytest/Dockerfile
+  server2:
+    container_name: python-request
+    image: python-request
+    depends_on:
+      - server        
+    networks:
+      vpcbr:
+        ipv4_address: 10.0.0.4
+    build:      
+      dockerfile: ./pytest/Dockerfile
   
 
 volumes:

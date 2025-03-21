@@ -15,7 +15,7 @@ dbdata:
     port: "5432"
     dbUser: postgres
     dbPassword: postgres
-    dslMode: "disable"
+    sslMode: "disable"
 bucket:
     ipLimit: 1000
     loginLimit: 10

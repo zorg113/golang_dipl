@@ -67,11 +67,6 @@ func (a *Authorization) Authorization(request entity.Request) (bool, error) {
 	if !allow {
 		isAllow = false
 	}
-	a.log.Info().Msg("Chek password in bucket")
-	allow = a.getPermissionInBucket(request.Password, a.passwordBucketStorage, a.conf.Bucket.PasswordLimit)
-	if !allow {
-		isAllow = allow
-	}
 	a.log.Info().Msg("Check login in bucket")
 	allow = a.getPermissionInBucket(request.Login, a.loginBucketStorage, a.conf.Bucket.LoginLimit)
 	if !allow {
@@ -124,6 +119,15 @@ func (a *Authorization) ResetIPBucket(ip string) bool {
 		return false
 	}
 	delete(a.ipBucketStorage, ip)
+	return true
+}
+
+func (a *Authorization) ResetPasswordInBucket(password string) bool {
+	_, ok := a.passwordBucketStorage[password]
+	if !ok {
+		return false
+	}
+	delete(a.passwordBucketStorage, password)
 	return true
 }
 

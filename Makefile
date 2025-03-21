@@ -32,15 +32,24 @@ build.docker:
 
 .PHONY: build
 build:
-	docker compose build
+	docker compose -f docker-compose.yml build
 
 .PHONY: run
 run: build
-	docker compose up
+	docker compose -f docker-compose.yml up
 
 .PHONY: stop
 stop: 
-	docker compose down
+	docker compose -f docker-compose.yml down
+
+.PHONY: integration.test.run
+integration.test.run:
+	docker compose -f docker-compose-test.yml build
+	docker compose -f docker-compose-test.yml up
+
+.PHONY: integration.test.stop	
+integration.test.stop:
+	docker compose -f docker-compose-test.yml down
 
 .PHONY:migrate
 migrate:
@@ -56,4 +65,4 @@ migrate.up:
 
 .PHONY: test
 test:
-	go test -race ./...
+	go test -race -count 100 ./...
