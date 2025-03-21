@@ -1,9 +1,11 @@
+# Help
+## Запуск кода
 Запуск контейнера:
-         make run
+* make run
 Подключение к консоли сервиса:
-         docker attach <CONTAINER>
+* docker attach <CONTAINER>
 Запуск интеграционных тестов:
-         make integration.test.run
+* make integration.test.run
 ===============================================================
 # ТЗ на разработку сервиса "Анти-брутфорс"
 
