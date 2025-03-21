@@ -21,14 +21,15 @@ linters:
   disable-all: true
   enable:
     - asciicheck
+    - bodyclose
+    #    - deadcode
     #    - depguard
     - dogsled
     - dupl
-    - bodyclose
     - durationcheck
     - errorlint
     - exhaustive
-    - copyloopvar
+    #    -copyloopvar
     - funlen
     - gci
     - gocognit
@@ -39,10 +40,13 @@ linters:
     - gofmt
     - gofumpt
     - goheader
+    - gomoddirectives
+    - gomodguard
     - goprintffuncname
     - gosec
     - gosimple
     - govet
+    #    - ifshort
     - importas
     - ineffassign
     - lll
@@ -55,12 +59,18 @@ linters:
     - prealloc
     - predeclared
     - revive
+    - rowserrcheck
+    - sqlclosecheck
     - staticcheck
+    #    - structcheck
     - stylecheck
     - tagliatelle
     - thelper
+    - tparallel
     - typecheck
     - unconvert
     - unparam
     - unused
+    #    - varcheck
+    - wastedassign
     - whitespace
