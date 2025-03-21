@@ -21,7 +21,6 @@ func NewWhiteList(stor WhiteListStore, log *zerolog.Logger) *WhiteList {
 }
 
 func (w *WhiteList) AddIP(network entity.IpNetwork) error {
-	w.log.Info().Msg("Get prefix")
 	prefix, err := GetPrefix(network.Ip, network.Mask)
 	if err != nil {
 		return err
@@ -34,7 +33,6 @@ func (w *WhiteList) AddIP(network entity.IpNetwork) error {
 }
 
 func (w *WhiteList) DeleteIP(network entity.IpNetwork) error {
-	w.log.Info().Msg("Get prefix")
 	prefix, err := GetPrefix(network.Ip, network.Mask)
 	if err != nil {
 		return err

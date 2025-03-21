@@ -1,6 +1,7 @@
 
 services:
   db:
+    container_name: anti-bruteforce_database
     image: postgres:latest
     restart: always
     environment:

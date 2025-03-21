@@ -1,6 +1,7 @@
 package cli
 
 import (
+	"fmt"
 	"os"
 	"strings"
 
@@ -72,10 +73,9 @@ func (cli *CommandLineInterface) Run(ch chan os.Signal) {
 		}
 	}()
 	prompt.New(executer, completer).Run()
-	prompt.Input(">", completer)
 }
 func checkLenCommand(command []string, msg string) bool {
-	ret := len(command) != 4
+	ret := len(command) == 4
 	if !ret {
 		println("Usage: " + msg)
 	}
@@ -183,7 +183,7 @@ func (cli *CommandLineInterface) getIpsFromBlackList() {
 		return
 	}
 	for _, ip := range ips {
-		println("ip:%s mask:%s", ip.Ip, ip.Mask)
+		fmt.Printf("ip:%s mask:%s\n", ip.Ip, ip.Mask)
 	}
 }
 
@@ -222,7 +222,7 @@ func (cli *CommandLineInterface) getIpsFromWhiteList() {
 		return
 	}
 	for _, ip := range ips {
-		println("ip:%s mask:%s", ip.Ip, ip.Mask)
+		fmt.Printf("ip:%s mask:%s\n", ip.Ip, ip.Mask)
 	}
 }
 

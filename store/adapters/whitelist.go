@@ -23,7 +23,7 @@ func NewWhiteListStorage(client *client.PostgresSql) *WhiteListStorage {
 
 func (w *WhiteListStorage) AddIP(prefix, mask string) error {
 	var isExist bool
-	err := w.client.Db.QueryRow(insertIPInWiteList, prefix, mask).Scan(&isExist)
+	err := w.client.Db.QueryRow(isIPExistWiteList, prefix, mask).Scan(&isExist)
 	if err != nil {
 		return err
 	}
