@@ -1,0 +1,23 @@
+name: CheckLintAndTest
+on: push
+jobs:
+    test-diplom:
+        runs-on: ubuntu-latest
+        steps:
+        - name: Set up on Go
+          uses: actions/setup-go@v5
+          with:
+               go-version: 1.23
+        - name: Check out code into the Go module directory
+          uses: actions/checkout@v3
+        
+        - name: Lint 
+          run: 
+            make lint
+        - name: build
+          run: 
+            make build
+        - name: Test
+          run: 
+            make test
+            
