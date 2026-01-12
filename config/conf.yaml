@@ -1,0 +1,23 @@
+listen:
+    type: port
+    bindIP: 10.0.0.3
+    port: "8080"
+server:
+    readTimeout: 10
+    writeTimeout: 30
+    idleTimeout: 40
+    serverType: http
+appconfig:
+    logLevel: info
+dbdata:
+    host: 10.0.0.2
+    dbName: postgres
+    port: "5432"
+    dbUser: postgres
+    dbPassword: postgres
+    sslMode: "disable"
+bucket:
+    ipLimit: 1000
+    loginLimit: 10
+    passwordLimit: 10
+    resetBucketInterval: 100

@@ -1,0 +1,154 @@
+package service
+
+import (
+	"time"
+
+	"github.com/rs/zerolog"
+	"github.com/zorg113/golang_dipl/atibruteforce/internal/config"
+	"github.com/zorg113/golang_dipl/atibruteforce/model/entity"
+	"golang.org/x/time/rate"
+)
+
+type Authorization struct {
+	ipBucketStorage       map[string]*RateLimiter
+	loginBucketStorage    map[string]*RateLimiter
+	passwordBucketStorage map[string]*RateLimiter
+	blackList             *BlackList
+	whiteList             *WhiteList
+	conf                  *config.Config
+	log                   *zerolog.Logger
+}
+
+func NewAuthorization(bList *BlackList, wList *WhiteList, cfg *config.Config, logger *zerolog.Logger) *Authorization {
+	ipBucketStorage := make(map[string]*RateLimiter)
+	loginBucketStorage := make(map[string]*RateLimiter)
+	passwordBucketStorage := make(map[string]*RateLimiter)
+	auth := &Authorization{
+		ipBucketStorage:       ipBucketStorage,
+		loginBucketStorage:    loginBucketStorage,
+		passwordBucketStorage: passwordBucketStorage,
+		blackList:             bList,
+		whiteList:             wList,
+		conf:                  cfg,
+		log:                   logger,
+	}
+	go auth.deleteUnusedBucket()
+	return auth
+}
+
+func (a *Authorization) Authorization(request entity.Request) (bool, error) {
+	a.log.Info().Msg("Check ip in black list")
+	ipNetworkList, err := a.blackList.GetIPs()
+	if err != nil {
+		return false, err
+	}
+	isIPInBlackList, err := a.checkIPByNetworkList(request.IP, ipNetworkList)
+	if err != nil {
+		return false, err
+	}
+	if isIPInBlackList {
+		return false, nil
+	}
+	a.log.Info().Msg("Check login in white list")
+	ipNetworkList, err = a.whiteList.GetIPs()
+	if err != nil {
+		return false, err
+	}
+	isLoginInWhiteList, err := a.checkIPByNetworkList(request.IP, ipNetworkList)
+	if err != nil {
+		return false, err
+	}
+	if isLoginInWhiteList {
+		return true, nil
+	}
+	a.log.Info().Msg("Check ip in bucket")
+	isAllow := true
+	allow := a.getPermissionInBucket(request.IP, a.ipBucketStorage, a.conf.Bucket.IPLimit)
+	if !allow {
+		isAllow = false
+	}
+	a.log.Info().Msg("Check login in bucket")
+	allow = a.getPermissionInBucket(request.Login, a.loginBucketStorage, a.conf.Bucket.LoginLimit)
+	if !allow {
+		isAllow = allow
+	}
+	return isAllow, nil
+}
+
+func (a *Authorization) newBucket(limit int) *RateLimiter {
+	r := NewRateLimiter(rate.Limit(float64(limit)/time.Duration.Seconds(60*time.Second)), limit)
+	return r
+}
+
+func (a *Authorization) checkIPByNetworkList(ip string, ipNetworkList []entity.IPNetwork) (bool, error) {
+	for _, network := range ipNetworkList {
+		prefix, err := GetPrefix(ip, network.Mask)
+		if err != nil {
+			return false, err
+		}
+		if prefix == network.IP {
+			return true, nil
+		}
+	}
+	return false, nil
+}
+
+func (a *Authorization) getPermissionInBucket(request string, bucketStorage map[string]*RateLimiter, limit int) bool {
+	limiter, ok := bucketStorage[request]
+	if !ok {
+		bucketStorage[request] = a.newBucket(limit)
+		allow := bucketStorage[request].Allow()
+		return allow
+	}
+	allow := limiter.Allow()
+	return allow
+}
+
+func (a *Authorization) ResetLoginInBucket(login string) bool {
+	_, ok := a.loginBucketStorage[login]
+	if !ok {
+		return false
+	}
+	delete(a.loginBucketStorage, login)
+	return true
+}
+
+func (a *Authorization) ResetIPBucket(ip string) bool {
+	_, ok := a.ipBucketStorage[ip]
+	if !ok {
+		return false
+	}
+	delete(a.ipBucketStorage, ip)
+	return true
+}
+
+func (a *Authorization) ResetPasswordInBucket(password string) bool {
+	_, ok := a.passwordBucketStorage[password]
+	if !ok {
+		return false
+	}
+	delete(a.passwordBucketStorage, password)
+	return true
+}
+
+func (a *Authorization) deleteUnusedBucket() {
+	ticker := time.NewTicker(60 * time.Second)
+	for {
+		<-ticker.C
+		for ip, lim := range a.ipBucketStorage {
+			if time.Since(lim.LastEvent) > time.Duration(a.conf.Bucket.ResetBucketInterval)*time.Second {
+				delete(a.ipBucketStorage, ip)
+			}
+		}
+		for login, lim := range a.loginBucketStorage {
+			if time.Since(lim.LastEvent) > time.Duration(a.conf.Bucket.ResetBucketInterval)*time.Second {
+				delete(a.loginBucketStorage, login)
+			}
+		}
+		for password, lim := range a.passwordBucketStorage {
+			if time.Since(lim.LastEvent) > time.Duration(a.conf.Bucket.ResetBucketInterval)*time.Second {
+				delete(a.passwordBucketStorage, password)
+			}
+		}
+	}
+}
