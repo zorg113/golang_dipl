@@ -6,11 +6,11 @@ import (
 )
 
 func GetPrefix(inIP string, inMask string) (string, error) {
-	ipv4 := net.ParseIP(inIP)
+	ipv4 := net.ParseIP(inIP).To4()
 	if ipv4 == nil {
 		return "", fmt.Errorf("invalid IP address %s", inIP)
 	}
-	mask := net.ParseIP(inMask)
+	mask := net.ParseIP(inMask).To4()
 	if mask == nil {
 		return "", fmt.Errorf("invalid IP mask: %s", inMask)
 	}

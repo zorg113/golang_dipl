@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package whitelist;
 
-option go_package = "internal/controller/grpcapi/whitelistpb";
+option go_package = "github.com/zorg113/golang_dipl/atibruteforce/internal/controller/grpcapi/whitelistpb";
 
 message IpNetwork {
   string ip = 1;

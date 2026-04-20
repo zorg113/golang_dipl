@@ -1,14 +1,15 @@
 package service
 
 import (
+	"sync/atomic"
 	"time"
 
 	"golang.org/x/time/rate"
 )
 
 type RateLimiter struct {
-	rate      *rate.Limiter
-	LastEvent time.Time
+	rate          *rate.Limiter
+	lastEventNano atomic.Int64
 }
 
 func NewRateLimiter(r rate.Limit, b int) *RateLimiter {
@@ -17,7 +18,10 @@ func NewRateLimiter(r rate.Limit, b int) *RateLimiter {
 }
 
 func (rm *RateLimiter) Allow() bool {
-	rm.LastEvent = time.Now()
-	allow := rm.rate.Allow()
-	return allow
+	rm.lastEventNano.Store(time.Now().UnixNano())
+	return rm.rate.Allow()
+}
+
+func (rm *RateLimiter) LastEvent() time.Time {
+	return time.Unix(0, rm.lastEventNano.Load())
 }

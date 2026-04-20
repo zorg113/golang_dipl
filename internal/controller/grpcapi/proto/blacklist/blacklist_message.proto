@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package blacklist;
 
-option go_package = "internal/controller/grpcapi/blacklistpb";
+option go_package = "github.com/zorg113/golang_dipl/atibruteforce/internal/controller/grpcapi/blacklistpb";
 
 message IpNetwork {
   string ip = 1;

@@ -4,6 +4,7 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/rs/zerolog"
 	"github.com/zorg113/golang_dipl/atibruteforce/internal/controller/httpapi/handlers"
+	"github.com/zorg113/golang_dipl/atibruteforce/internal/controller/httpapi/middleware"
 )
 
 type HTTPAPIRouter struct { //nolint:revive
@@ -27,15 +28,20 @@ func NewHTTPAPIRouter(auth *handlers.Authorization, balckList *handlers.BlackLis
 	}
 }
 
-func (r *HTTPAPIRouter) InitRouters() {
+func (r *HTTPAPIRouter) InitRouters(apiKey string) {
+	adminMiddleware := middleware.AdminAuth(apiKey, r.log)
+
 	r.router.HandleFunc("/auth/check", r.auth.AuthorizationHanler).Methods("POST")
-	r.router.HandleFunc("/auth/reset", r.bucket.ResetBucket).Methods("DELETE")
-	r.router.HandleFunc("/auth/blacklist", r.blackLits.AddIP).Methods("POST")
-	r.router.HandleFunc("/auth/blacklist", r.blackLits.GetIPs).Methods("GET")
-	r.router.HandleFunc("/auth/blacklist", r.blackLits.DeleteIP).Methods("DELETE")
-	r.router.HandleFunc("/auth/whitelist", r.whiteList.AddIP).Methods("POST")
-	r.router.HandleFunc("/auth/whitelist", r.whiteList.GetIPs).Methods("GET")
-	r.router.HandleFunc("/auth/whitelist", r.whiteList.DeleteIP).Methods("DELETE")
+
+	admin := r.router.PathPrefix("/admin").Subrouter()
+	admin.Use(adminMiddleware)
+	admin.HandleFunc("/auth/reset", r.bucket.ResetBucket).Methods("DELETE")
+	admin.HandleFunc("/auth/blacklist", r.blackLits.AddIP).Methods("POST")
+	admin.HandleFunc("/auth/blacklist", r.blackLits.GetIPs).Methods("GET")
+	admin.HandleFunc("/auth/blacklist", r.blackLits.DeleteIP).Methods("DELETE")
+	admin.HandleFunc("/auth/whitelist", r.whiteList.AddIP).Methods("POST")
+	admin.HandleFunc("/auth/whitelist", r.whiteList.GetIPs).Methods("GET")
+	admin.HandleFunc("/auth/whitelist", r.whiteList.DeleteIP).Methods("DELETE")
 }
 
 func (r *HTTPAPIRouter) GetRouter() *mux.Router {

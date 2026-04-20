@@ -7,6 +7,7 @@ import (
 	"github.com/rs/zerolog"
 	"github.com/zorg113/golang_dipl/atibruteforce/internal/common"
 	"github.com/zorg113/golang_dipl/atibruteforce/internal/controller/grpcapi/blacklistpb"
+	"github.com/zorg113/golang_dipl/atibruteforce/internal/controller/grpcapi/commonpb"
 	"github.com/zorg113/golang_dipl/atibruteforce/model/entity"
 	"github.com/zorg113/golang_dipl/atibruteforce/model/service"
 )
@@ -14,7 +15,7 @@ import (
 var errInvalidInputIP = errors.New("invalid input IP address from client")
 
 type BlackListServer struct {
-	blacklistpb.UnimplementedBlackListServiceServer
+	blacklistpb.UnimplementedBlackListServer
 	service *service.BlackList
 	log     *zerolog.Logger
 }
@@ -61,7 +62,7 @@ func (s *BlackListServer) RemoveIP(_ context.Context, req *blacklistpb.RemoveIPR
 	return &blacklistpb.RemoveIPResponse{IsRemoveIp: true}, nil
 }
 
-func (s *BlackListServer) GetIPs(_ context.Context, stream blacklistpb.BlackListService_GetIpListServer) error {
+func (s *BlackListServer) GetIPs(stream blacklistpb.BlackList_GetIpListServer) error {
 	s.log.Info().Msg("getting IP addresses from blacklist GRPC")
 	ips, err := s.service.GetIPs()
 	if err != nil {
@@ -69,10 +70,12 @@ func (s *BlackListServer) GetIPs(_ context.Context, stream blacklistpb.BlackList
 		return err
 	}
 	for _, net := range ips {
-		err := stream.Send(&blacklistpb.GetIpListResponse{IpNetwork: &blacklistpb.IpNetwork{
-			Ip:   net.IP,
-			Mask: net.Mask,
-		}})
+		err := stream.Send(&blacklistpb.GetIpListResponse{
+			IpNetwork: &commonpb.IpNetwork{
+				Ip:   net.IP,
+				Mask: net.Mask,
+			},
+		})
 		if err != nil {
 			s.log.Error().Err(err).Msg("failed to send IP address to client")
 			return err

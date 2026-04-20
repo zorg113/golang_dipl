@@ -1,18 +1,15 @@
 syntax = "proto3";
-
 package bucket;
+option go_package = "github.com/zorg113/golang_dipl/atibruteforce/internal/controller/grpcapi/bucketpb";
 
-option go_package = "internal/controller/grpcapi/bucketpb";
+import "common/common.proto";
 
-import "bucket_message.proto";
-
-message ResetBucketRequest { Request request = 1; }
-
+message ResetBucketRequest  { common.Request request = 1; }
 message ResetBucketResponse {
-  bool resetLogin = 1;
-  bool resetIp = 2;
+  bool reset_login = 1; // ← было resetLogin
+  bool reset_ip    = 2; // ← было resetIp
 }
 
-service BucketService {
+service Bucket {
   rpc ResetBucket(ResetBucketRequest) returns (ResetBucketResponse);
 }

@@ -39,6 +39,13 @@ func (b *Bucket) ResetBucket(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
+	isLoginReset := b.service.ResetLoginInBucket(request.Login)
+	if !isLoginReset {
+		b.log.Warn().Str("login", request.Login).Msg("Failed to reset login bucket")
+		w.WriteHeader(http.StatusOK)
+		_, _ = w.Write([]byte("resetLogin=false"))
+		return
+	}
 	_, err = w.Write([]byte("resetLogin=true"))
 	if err != nil {
 		b.log.Error().Err(err).Msg("Failed to write response")

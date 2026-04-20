@@ -1,6 +1,7 @@
-FROM python:3.10-alpine
+FROM python:3.14-alpine
 WORKDIR /pytest
-RUN pip install requests pytest
-COPY ./pytest/test_blocked.py ./
+COPY pytest/requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+COPY ./pytest/*.py .
 RUN ls ./
-CMD ["pytest", "test_blocked.py"]
+CMD ["pytest", "-v", "-s"]

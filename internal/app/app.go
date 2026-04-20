@@ -90,7 +90,7 @@ func (a *AntiBruteForceApp) StartAppAPI() {
 		}
 	case "http":
 		a.logger.Info().Msg("Init http server")
-		a.router.InitRouters()
+		a.router.InitRouters(a.config.Admin.APIKey)
 
 		server := httpapi.NewHTTPAPIServer(a.router.GetRouter(), a.config, a.logger)
 		go server.ShutdowService(c)
