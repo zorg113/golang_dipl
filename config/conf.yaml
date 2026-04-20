@@ -19,5 +19,7 @@ dbdata:
 bucket:
     ipLimit: 1000
     loginLimit: 10
-    passwordLimit: 10
-    resetBucketInterval: 100
+    passwordLimit: 100
+    resetBucketInterval: 600 
+admin:
+    apiKey: "test-admin-key-123"

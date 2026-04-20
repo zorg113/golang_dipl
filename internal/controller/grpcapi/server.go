@@ -11,6 +11,7 @@ import (
 	"github.com/zorg113/golang_dipl/atibruteforce/internal/controller/grpcapi/authorizationpb"
 	"github.com/zorg113/golang_dipl/atibruteforce/internal/controller/grpcapi/blacklistpb"
 	"github.com/zorg113/golang_dipl/atibruteforce/internal/controller/grpcapi/bucketpb"
+	"github.com/zorg113/golang_dipl/atibruteforce/internal/controller/grpcapi/interceptor"
 	"github.com/zorg113/golang_dipl/atibruteforce/internal/controller/grpcapi/whitelistpb"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
@@ -18,21 +19,29 @@ import (
 
 type ServerGRPC struct {
 	authorizationServer authorizationpb.AuthorizationServer
-	blacklistServer     blacklistpb.BlackListServiceServer
-	whitelistServer     whitelistpb.WhiteListServiceServer
-	bucketServer        bucketpb.BucketServiceServer
+	blacklistServer     blacklistpb.BlackListServer
+	whitelistServer     whitelistpb.WhiteListServer
+	bucketServer        bucketpb.BucketServer
 	grpcServer          *grpc.Server
 	config              *config.Config
 	log                 *zerolog.Logger
 }
 
-func NewServerGRPC(authorizationServer authorizationpb.AuthorizationServer, blacklistServer blacklistpb.BlackListServiceServer, whitelistServer whitelistpb.WhiteListServiceServer, bucketServer bucketpb.BucketServiceServer, config *config.Config, log *zerolog.Logger) *ServerGRPC { //nolint:lll
+func NewServerGRPC(authorizationServer authorizationpb.AuthorizationServer, blacklistServer blacklistpb.BlackListServer, whitelistServer whitelistpb.WhiteListServer, bucketServer bucketpb.BucketServer, config *config.Config, log *zerolog.Logger) *ServerGRPC { //nolint:lll
+	grpcServer := grpc.NewServer(
+		grpc.UnaryInterceptor(
+			interceptor.AdminAuth(config.Admin.APIKey, log),
+		),
+		grpc.StreamInterceptor(
+			interceptor.StreamAdminAuth(config.Admin.APIKey, log),
+		),
+	)
 	return &ServerGRPC{
 		authorizationServer: authorizationServer,
 		blacklistServer:     blacklistServer,
 		whitelistServer:     whitelistServer,
 		bucketServer:        bucketServer,
-		grpcServer:          grpc.NewServer(),
+		grpcServer:          grpcServer,
 		config:              config,
 		log:                 log,
 	}
@@ -45,10 +54,13 @@ func (s *ServerGRPC) Start() error {
 		return err
 	}
 	authorizationpb.RegisterAuthorizationServer(s.grpcServer, s.authorizationServer)
-	blacklistpb.RegisterBlackListServiceServer(s.grpcServer, s.blacklistServer)
-	whitelistpb.RegisterWhiteListServiceServer(s.grpcServer, s.whitelistServer)
-	bucketpb.RegisterBucketServiceServer(s.grpcServer, s.bucketServer)
-	reflection.Register(s.grpcServer)
+	blacklistpb.RegisterBlackListServer(s.grpcServer, s.blacklistServer)
+	whitelistpb.RegisterWhiteListServer(s.grpcServer, s.whitelistServer)
+	bucketpb.RegisterBucketServer(s.grpcServer, s.bucketServer)
+	if s.config.AppConfig.LogLevel == "debug" {
+		reflection.Register(s.grpcServer)
+		s.log.Warn().Msg("gRPC reflection enabled — disable in production")
+	}
 	err = s.grpcServer.Serve(listener)
 	if err != nil {
 		return err

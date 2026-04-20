@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package bucket;
 
-option go_package = "internal/controller/grpcapi/bucketpb";
+option go_package = "github.com/zorg113/golang_dipl/atibruteforce/internal/controller/grpcapi/bucketpb";
 
 message Request {
   string login = 1;

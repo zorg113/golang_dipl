@@ -31,7 +31,7 @@ func (w *WhiteListStorage) AddIP(prefix, mask string) error {
 	if isExist {
 		return common.IPAlreadyExist
 	}
-	err = w.client.DB.QueryRow(insertIPInWiteList, prefix, mask).Err()
+	_, err = w.client.DB.Exec(insertIPInWiteList, prefix, mask)
 	if err != nil {
 		return err
 	}
@@ -39,7 +39,7 @@ func (w *WhiteListStorage) AddIP(prefix, mask string) error {
 }
 
 func (w *WhiteListStorage) DeleteIP(prefix, mask string) error {
-	err := w.client.DB.QueryRow(deleteIPFromWhiteList, prefix, mask).Err()
+	_, err := w.client.DB.Exec(deleteIPFromWhiteList, prefix, mask)
 	if err != nil {
 		return err
 	}

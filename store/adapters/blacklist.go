@@ -31,7 +31,7 @@ func (b *BlackListStorage) AddIP(prefix, mask string) error {
 	if isExist {
 		return common.IPAlreadyExist
 	}
-	err = b.client.DB.QueryRow(insertIPInBlackList, prefix, mask).Err()
+	_, err = b.client.DB.Exec(insertIPInBlackList, prefix, mask)
 	if err != nil {
 		return err
 	}
@@ -39,7 +39,7 @@ func (b *BlackListStorage) AddIP(prefix, mask string) error {
 }
 
 func (b *BlackListStorage) DeleteIP(prefix, mask string) error {
-	err := b.client.DB.QueryRow(deleteIPFromBlackList, prefix, mask).Err()
+	_, err := b.client.DB.Exec(deleteIPFromBlackList, prefix, mask)
 	if err != nil {
 		return err
 	}

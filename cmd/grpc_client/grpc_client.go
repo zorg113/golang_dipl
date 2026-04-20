@@ -5,14 +5,17 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"os"
 
 	"github.com/zorg113/golang_dipl/atibruteforce/internal/config"
 	"github.com/zorg113/golang_dipl/atibruteforce/internal/controller/grpcapi/authorizationpb"
 	"github.com/zorg113/golang_dipl/atibruteforce/internal/controller/grpcapi/blacklistpb"
 	"github.com/zorg113/golang_dipl/atibruteforce/internal/controller/grpcapi/bucketpb"
+	"github.com/zorg113/golang_dipl/atibruteforce/internal/controller/grpcapi/commonpb"
 	"github.com/zorg113/golang_dipl/atibruteforce/internal/controller/grpcapi/whitelistpb"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
+	"google.golang.org/grpc/metadata"
 )
 
 func main() {
@@ -20,6 +23,16 @@ func main() {
 	if err != nil {
 		fmt.Println(err)
 	}
+	apiKey := os.Getenv("ADMIN_API_KEY")
+	if apiKey == "" {
+		fmt.Println("ADMIN_API_KEY is not set")
+		return
+	}
+
+	adminCtx := metadata.AppendToOutgoingContext(
+		context.Background(),
+		"x-admin-key", apiKey,
+	)
 
 	trn := grpc.WithTransportCredentials(insecure.NewCredentials())
 	dial, err := grpc.NewClient(conf.Listen.BindIP+":"+conf.Listen.Port, trn)
@@ -27,23 +40,23 @@ func main() {
 		fmt.Printf("Failed to dial: %v", err)
 		return
 	}
-	clientBlackList := blacklistpb.NewBlackListServiceClient(dial)
-	clientWhiteList := whitelistpb.NewWhiteListServiceClient(dial)
-	clientBucket := bucketpb.NewBucketServiceClient(dial)
+	clientBlackList := blacklistpb.NewBlackListClient(dial)
+	clientWhiteList := whitelistpb.NewWhiteListClient(dial)
+	clientBucket := bucketpb.NewBucketClient(dial)
 	clientAuthorization := authorizationpb.NewAuthorizationClient(dial)
-	getIPListInBlackList(clientBlackList)
+	getIPListInBlackList(adminCtx, clientBlackList)
 	fmt.Println()
-	getIPListInWhiteList(clientWhiteList)
+	getIPListInWhiteList(adminCtx, clientWhiteList)
 	fmt.Println()
-	resetBucket(clientBucket)
+	resetBucket(adminCtx, clientBucket)
 	fmt.Println()
-	execAuthorization(clientAuthorization)
+	execAuthorization(context.Background(), clientAuthorization)
 }
 
-func execAuthorization(client authorizationpb.AuthorizationClient) {
-	resp, err := client.TryAuthorization(context.Background(),
+func execAuthorization(ctx context.Context, client authorizationpb.AuthorizationClient) {
+	resp, err := client.TryAuthorization(ctx,
 		&authorizationpb.AuthorizationRequest{
-			Request: &authorizationpb.Request{
+			Request: &commonpb.Request{
 				Login:    "admin",
 				Password: "admin",
 				Ip:       "192.168.0.1",
@@ -56,8 +69,8 @@ func execAuthorization(client authorizationpb.AuthorizationClient) {
 	}
 }
 
-func getIPListInBlackList(client blacklistpb.BlackListServiceClient) {
-	stream, err := client.GetIpList(context.Background(), &blacklistpb.GetIpListRequest{})
+func getIPListInBlackList(ctx context.Context, client blacklistpb.BlackListClient) {
+	stream, err := client.GetIpList(ctx, &blacklistpb.GetIpListRequest{})
 	if err != nil {
 		fmt.Printf("Error: %v", err)
 		return
@@ -78,8 +91,8 @@ func getIPListInBlackList(client blacklistpb.BlackListServiceClient) {
 	}
 }
 
-func getIPListInWhiteList(client whitelistpb.WhiteListServiceClient) {
-	stream, err := client.GetIpList(context.Background(), &whitelistpb.GetIpListRequest{})
+func getIPListInWhiteList(ctx context.Context, client whitelistpb.WhiteListClient) {
+	stream, err := client.GetIpList(ctx, &whitelistpb.GetIpListRequest{})
 	if err != nil {
 		fmt.Printf("Error: %v", err)
 		return
@@ -100,10 +113,10 @@ func getIPListInWhiteList(client whitelistpb.WhiteListServiceClient) {
 	}
 }
 
-func resetBucket(client bucketpb.BucketServiceClient) {
-	rest, err := client.ResetBucket(context.Background(),
+func resetBucket(ctx context.Context, client bucketpb.BucketClient) {
+	rest, err := client.ResetBucket(ctx,
 		&bucketpb.ResetBucketRequest{
-			Request: &bucketpb.Request{
+			Request: &commonpb.Request{
 				Login:    "admin",
 				Password: "admin",
 				Ip:       "192.168.0.1",

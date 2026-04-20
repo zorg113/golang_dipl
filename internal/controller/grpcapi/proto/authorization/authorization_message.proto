@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package authorization;
 
-option go_package = "internal/controller/grpcapi/authorizationpb";
+option go_package = "github.com/zorg113/golang_dipl/atibruteforce/internal/controller/grpcapi/authorizationpb";
 
 message Request {
   string login = 1;

@@ -5,13 +5,14 @@ import (
 
 	"github.com/rs/zerolog"
 	"github.com/zorg113/golang_dipl/atibruteforce/internal/common"
+	"github.com/zorg113/golang_dipl/atibruteforce/internal/controller/grpcapi/commonpb"
 	"github.com/zorg113/golang_dipl/atibruteforce/internal/controller/grpcapi/whitelistpb"
 	"github.com/zorg113/golang_dipl/atibruteforce/model/entity"
 	"github.com/zorg113/golang_dipl/atibruteforce/model/service"
 )
 
 type WhiteListServer struct {
-	whitelistpb.UnimplementedWhiteListServiceServer
+	whitelistpb.UnimplementedWhiteListServer
 	service *service.WhiteList
 	log     *zerolog.Logger
 }
@@ -59,7 +60,7 @@ func (s *WhiteListServer) RemoveIP(_ context.Context, req *whitelistpb.RemoveIPR
 	return &whitelistpb.RemoveIPResponse{IsRemoveIp: true}, nil
 }
 
-func (s *WhiteListServer) GetIPs(_ context.Context, stream whitelistpb.WhiteListService_GetIpListServer) error {
+func (s *WhiteListServer) GetIPs(_ context.Context, stream whitelistpb.WhiteList_GetIpListServer) error {
 	s.log.Info().Msg("getting IP addresses from whitelist GRPC")
 	ips, err := s.service.GetIPs()
 	if err != nil {
@@ -67,7 +68,7 @@ func (s *WhiteListServer) GetIPs(_ context.Context, stream whitelistpb.WhiteList
 		return err
 	}
 	for _, net := range ips {
-		ip := &whitelistpb.IpNetwork{
+		ip := &commonpb.IpNetwork{
 			Ip:   net.IP,
 			Mask: net.Mask,
 		}

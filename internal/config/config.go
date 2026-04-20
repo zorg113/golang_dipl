@@ -32,39 +32,26 @@ type DBData struct {
 	DBPassword string `yaml:"dbPassword"`
 	SslMode    string `yaml:"sslMode"`
 }
+
 type Bucket struct {
 	IPLimit             int `yaml:"ipLimit"`
 	LoginLimit          int `yaml:"loginLimit"`
 	PasswordLimit       int `yaml:"passwordLimit"`
 	ResetBucketInterval int `yaml:"resetBucketInterval"`
 }
+
+type AdminConf struct {
+	APIKey string `yaml:"apiKey"`
+}
+
 type Config struct {
 	Listen    Listen
 	Server    Server
 	AppConfig AppConfig
 	DBData    DBData
 	Bucket    Bucket
+	Admin     AdminConf
 }
-
-// func WriteData(conf Config) {
-// 	yamlFile, err := yaml.Marshal(&conf)
-// 	if err != nil {
-// 		panic(err)
-// 	}
-
-// 	fmt.Println(string(yamlFile))
-
-// 	f, err := os.Create("config.yaml")
-// 	if err != nil {
-// 		panic(err)
-// 	}
-// 	defer f.Close()
-
-// 	_, err = f.Write(yamlFile)
-// 	if err != nil {
-// 		panic(err)
-// 	}
-// }
 
 func NewConfig(path string) (Config, error) {
 	var conf Config

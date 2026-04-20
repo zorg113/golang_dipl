@@ -23,6 +23,14 @@ func main() {
 		fmt.Println("cant't initialize config")
 		return
 	}
+	if key := os.Getenv("ADMIN_API_KEY"); key != "" {
+		conf.Admin.APIKey = key
+	}
+
+	if conf.Admin.APIKey == "" {
+		fmt.Println("ADMIN_API_KEY is not set")
+	}
+
 	fmt.Println("init logger")
 	logger := zerolog.New(os.Stderr).With().Timestamp().Logger()
 	app := app.NewAntiBruteForceApp(&logger, &conf)

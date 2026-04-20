@@ -12,7 +12,7 @@ import (
 )
 
 type BucketServer struct {
-	bucketpb.UnimplementedBucketServiceServer
+	bucketpb.UnimplementedBucketServer
 	service *service.Authorization
 	log     *zerolog.Logger
 }

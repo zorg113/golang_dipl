@@ -1,25 +1,23 @@
 syntax = "proto3";
-
 package whitelist;
+option go_package = "github.com/zorg113/golang_dipl/atibruteforce/internal/controller/grpcapi/whitelistpb";
 
-option go_package = "internal/controller/grpcapi/whitelistpb";
+import "common/common.proto";
 
-import "whitelist_message.proto";
+message AddIpRequest    { common.IpNetwork ip_network = 1; }
+message AddIpResponse   { bool is_add_ip = 1; }
 
-message AddIpRequest { IpNetwork ip_network = 1; }
-
-message AddIpResponse { bool is_add_ip = 1; }
-
-message RemoveIPRequest { IpNetwork ip_network = 1; }
-
+message RemoveIPRequest  { common.IpNetwork ip_network = 1; }
 message RemoveIPResponse { bool is_remove_ip = 1; }
 
-message GetIpListRequest {}
+message GetIpListRequest {
+  int32 page_size  = 1;
+  int32 page_token = 2;
+}
+message GetIpListResponse { common.IpNetwork ip_network = 1; }
 
-message GetIpListResponse { IpNetwork ip_network = 1; }
-
-service WhiteListService {
-  rpc AddIp(AddIpRequest) returns (AddIpResponse);
-  rpc RemoveIp(RemoveIPRequest) returns (RemoveIPResponse);
+service WhiteList {
+  rpc AddIp(AddIpRequest)         returns (AddIpResponse);
+  rpc RemoveIp(RemoveIPRequest)   returns (RemoveIPResponse);
   rpc GetIpList(GetIpListRequest) returns (stream GetIpListResponse);
 }
